@@ -1,3 +1,4 @@
+import { useAuth } from "../contexts/AuthContext";
 import MenuButton from "./MenuButton";
 import appLogo from "../assets/stock_route_logo.png";
 import gridIcon from "../assets/grid_icon.png";
@@ -6,6 +7,23 @@ import clipboardIcon from "../assets/clipboard_icon.png";
 import logoutIcon from "../assets/logout_icon.png";
 
 function SideNavigationMenu() {
+    const { signOut } = useAuth();
+
+    const handleLogout = async () => {
+        try {
+            const { error } = await signOut();
+            if (error) {
+                console.error('Logout error:', error);
+            } else {
+                console.log('Logout successful');
+                // The user will be automatically redirected to sign-in page
+                // due to the auth state change in AuthContext
+            }
+        } catch (err) {
+            console.error('Unexpected logout error:', err);
+        }
+    };
+
     return (
         <div className="col-span-4 h-screen bg-[#FFFFFF] flex flex-col justify-between shadow-[10px_0px_15px_-10px_rgba(0,0,0,0.3)]">
 
@@ -21,7 +39,7 @@ function SideNavigationMenu() {
             </div>
 
             <div className="mx-10">
-                <MenuButton icon={logoutIcon}>Logout</MenuButton>
+                <MenuButton icon={logoutIcon} onClick={handleLogout}>Logout</MenuButton>
             </div>
 
         </div>
