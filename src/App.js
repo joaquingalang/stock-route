@@ -1,35 +1,37 @@
-import SideNavigationMenu from "./components/SideNavigationMenu";
-import ProductsPage from "./pages/ProductsPage";
-import ApprovalsPage from "./pages/ApprovalsPage";
-import OrdersPage from "./pages/OrdersPage";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth, AuthProvider } from './contexts/AuthContext';
+import DashboardPage from './pages/DashboardPage';
+import SignInPage from './pages/SignInPage';
 
 function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="grid grid-cols-20 bg-[#EAEAEA]">
-      <SideNavigationMenu></SideNavigationMenu>
-      <OrdersPage></OrdersPage>
-      {/* <h1>1</h1>
-      <h1>2</h1>
-      <h1>3</h1>
-      <h1>4</h1>
-      <h1>5</h1>
-      <h1>6</h1>
-      <h1>7</h1>
-      <h1>8</h1>
-      <h1>9</h1>
-      <h1>10</h1>
-      <h1>11</h1>
-      <h1>12</h1>
-      <h1>13</h1>
-      <h1>14</h1>
-      <h1>15</h1>
-      <h1>16</h1>
-      <h1>17</h1>
-      <h1>18</h1>
-      <h1>19</h1>
-      <h1>20</h1> */}
-    </div>
+    <Router>
+      <Routes>
+        <Route 
+          path="/" 
+          element={user ? <Navigate to="/dashboard" replace /> : <SignInPage />} 
+        />
+        <Route 
+          path="/dashboard" 
+          element={user ? <DashboardPage /> : <Navigate to="/" replace />} 
+        />
+      </Routes>
+    </Router>
   );
 }
 
-export default App;
+function AppWrapper() {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+}
+
+export default AppWrapper;
