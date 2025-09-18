@@ -1,4 +1,4 @@
-function PopularProductTile({rank, image, name, quantity}) {
+function PopularProductTile({rank=1, image, name="Product Name", quantity=1}) {
 
     return (
         <div className="flex items-center mb-3">

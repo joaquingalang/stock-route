@@ -6,7 +6,10 @@ function OrderTrackerPanel({newOrders=0, totalOrders=0, inProgress=0}) {
                 <div className="flex justify-between items-center px-12 py-5">
                     
                     <div className="flex flex-col justify-center items-center">
-                        <h1 className="font font-semibold text-3xl mb-1">{newOrders}</h1>
+                        <div className="relative">
+                            <div className="w-2 h-2 bg-[#D72A1D] rounded-md absolute top-0 left-7"></div>
+                            <h1 className="font font-semibold text-3xl mb-1">{newOrders}</h1>
+                        </div>
                         <p className="font font-semibold text-lg">New Orders</p>
                     </div>
 
