@@ -1,11 +1,12 @@
 import SideNavigationMenu from "./components/SideNavigationMenu";
 import ProductsPage from "./pages/ProductsPage";
+import OrdersPage from "./pages/OrdersPage";
 
 function App() {
   return (
     <div className="grid grid-cols-20 bg-[#EAEAEA]">
       <SideNavigationMenu></SideNavigationMenu>
-      <ProductsPage></ProductsPage>
+      <OrdersPage></OrdersPage>
       {/* <h1>1</h1>
       <h1>2</h1>
       <h1>3</h1>
