@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuth, AuthProvider } from './contexts/AuthContext';
 import DashboardPage from './pages/DashboardPage';
 import SignInPage from './pages/SignInPage';
+import MainPage from './pages/MainPage';
 
 function App() {
   const { user, loading } = useAuth();
@@ -15,11 +16,11 @@ function App() {
       <Routes>
         <Route 
           path="/" 
-          element={user ? <Navigate to="/dashboard" replace /> : <SignInPage />} 
+          element={user ? <Navigate to="/main" replace /> : <SignInPage />} 
         />
         <Route 
-          path="/dashboard" 
-          element={user ? <DashboardPage /> : <Navigate to="/" replace />} 
+          path="/main" 
+          element={user ? <MainPage/> : <Navigate to="/" replace />} 
         />
       </Routes>
     </Router>
