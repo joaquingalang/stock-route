@@ -13,7 +13,6 @@ function OrderItemDetails({
   let statusBg = "";
   
   if (!show) return null;
-
  
 
   function setStatusDetails() {
@@ -41,23 +40,22 @@ function OrderItemDetails({
     <div className="fixed inset-0 z-50 flex justify-center items-center backdrop-blur">
       <div className="bg-white p-8 rounded-lg shadow-lg">
         <div className="grid grid-cols-3 gap-8">
-          <div>
-            <h1>Order ID: {order_id}</h1>
-          </div>
+            <h1 className="font-bold text-l">Order ID: {order_id}</h1>
           <hr className="col-span-3"></hr>
           <div className="flex justify-between col-span-3">
             <div>
-              <h1>BILL TO</h1>
-              <h1>{cust_id}</h1>
+              <h1 className="text-xs font-semibold text-gray-400">BILL TO</h1>
+              <h1 className="font-bold text-xl">{cust_id}</h1>
+               <h1 className="text-xs font-semibold text-gray-400 mt-2">Location</h1>
               <h1 className="max-w-xs break-words">
                 Blk 12 Lot 8, Mabini Street, Brgy. San Isidro Quezon City, Metro
                 Manila, 1105 Philippines
               </h1>
             </div>
             <div>
-              <h1 className="text-end">BILL DATE</h1>
-              <h1 className="text-end">{date}</h1>
-              <div className={statusBg + " min-w-[80px] rounded-sm py-1 self-center mt-3"}>
+                  <h1 className="text-end text-xs font-semibold text-gray-400">BILL TO</h1>
+              <h1 className="text-end font-bold text-xl">{date}</h1>
+              <div className={statusBg + " min-w-[80px] rounded-sm py-1 self-center mt-7"}>
           <div className="justify-center items-center h-[100%] p-1">
             <h1 className="text-white text-center">{statusText}</h1>
           </div>
@@ -67,10 +65,10 @@ function OrderItemDetails({
           
           <hr className="col-span-3"></hr>
           <div className="col-span-3">
-            <div className="grid grid-cols-3 gap-3 p-3 bg-[#D9D9D9] rounded-t-md">
-              <h1>Order Items</h1>
-              <h1>Quantity</h1>
-              <h1>Amount</h1>
+            <div className="grid grid-cols-3 gap-3 p-3 bg-[#D9D9D9] rounded-t-md text-center">
+              <h1 className="text-gray-500 font-semibold">Order Items</h1>
+              <h1 className="text-gray-500 font-semibold">Quantity</h1>
+              <h1 >Amount</h1>
             </div>
 
             {/* The more orders, the more rows here. */}
@@ -95,8 +93,8 @@ function OrderItemDetails({
 
           <hr className="col-span-3"></hr>
           <div className="flex justify-between col-span-3">
-            <h1>Subtotal</h1>
-            <h1>₱{amount}</h1>
+            <h1 className="font-bold">Total</h1>
+            <h1 className="font-bold">₱{amount}</h1>
           </div>
           <div></div>
           <div className="col-span-2 flex justify-end gap-3">

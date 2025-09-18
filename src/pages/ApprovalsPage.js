@@ -1,12 +1,10 @@
 import OrderItemTile from "../components/OrderItemTile";
 import { useState } from "react";
-import OrderItemDetails from "../components/OrderItemDetails";
+import ApprovalItemDetails from "../components/ApprovalItemDetails";
 import OrderTableHeader from "../components/OrderTableHeader";
 import OrderFilterButtons from "../components/OrderFilterButtons";
 
-//TODO: make sure to map the length of orders for OrderItemRows in OrderItemDetails.
-
-function OrdersPage() {
+function ApprovalsPage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [filter, setFilter] = useState("all");
@@ -18,10 +16,10 @@ function OrdersPage() {
 
   const columns = [
     { field: "order_id", label: "order_ID" },
-    { field: "cust_id", label: "customer_ID" },
-    { field: "amount", label: "Amount" },
-    { field: "date", label: "Date Ordered" },
-    { field: "status", label: "Status"},
+    { field: "cust_id", label: "customer_ID"},
+    { field: "amount", label: "Amount"},
+    { field: "date", label: "Date Ordered"},
+    { field: "items", label: "Items"},
   ];
 
   const [orders, setOrders] = useState([
@@ -30,21 +28,21 @@ function OrdersPage() {
       cust_id: "E23",
       amount: "508.59",
       date: "01/27/23",
-      status: "ready",
+      items: 2,
     },
     {
       order_id: "#23TRES",
       cust_id: "E58",
       amount: "508.59",
       date: "01/30/23",
-      status: "progress",
+      items: 5,
     },
     {
       order_id: "#23DFDS",
       cust_id: "E78",
       amount: "508.59",
       date: "01/02/23",
-      status: "completed",
+      items: 12,
     },
   ]);
 
@@ -54,13 +52,10 @@ function OrdersPage() {
         {/* Main Dashboard */}
         <div className="col-span-16">
           <div className="m-6">
+            
             <div className="grid grid-cols-8 grid-rows-8 gap-5">
               <div className="col-span-12 row-span-10 p-4">
-                <h1 className="font font-semibold text-lg mb-2">Orders</h1>
-                <OrderFilterButtons
-                  currentFilter={filter}
-                  onFilterChange={setFilter}
-                />
+                <h1 className="font font-semibold text-lg mb-2">New Orders</h1>
                 <OrderTableHeader columns={columns} />
 
                 <div className="overflow-y-auto max-h-150">
@@ -75,7 +70,7 @@ function OrdersPage() {
                     />
                   ))}
                   {showModal && selectedOrder && (
-                    <OrderItemDetails
+                    <ApprovalItemDetails
                       show={showModal}
                       onClick={() => setShowModal(false)}
                       {...selectedOrder}
@@ -91,4 +86,4 @@ function OrdersPage() {
   );
 }
 
-export default OrdersPage;
+export default ApprovalsPage;

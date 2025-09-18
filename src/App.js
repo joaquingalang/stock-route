@@ -1,5 +1,6 @@
 import SideNavigationMenu from "./components/SideNavigationMenu";
 import ProductsPage from "./pages/ProductsPage";
+import ApprovalsPage from "./pages/ApprovalsPage";
 import OrdersPage from "./pages/OrdersPage";
 
 function App() {

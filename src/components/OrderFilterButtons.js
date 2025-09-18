@@ -8,8 +8,8 @@
 
 
 function OrderFilterButtons({currentFilter, onFilterChange}){
-  return (  // ← Add this return statement!
-     <div className="grid grid-cols-5 gap-4 p-4 mb-3 items-center">
+  return ( 
+     <div className="grid grid-cols-4 gap-4 p-4 mb-3 items-center">
         <button onClick={() => onFilterChange("all")}>
           <h1 className={getFilterButtonStyle(currentFilter, "all")}>All Orders</h1>
         </button>
@@ -23,7 +23,7 @@ function OrderFilterButtons({currentFilter, onFilterChange}){
           <h1 className={getFilterButtonStyle(currentFilter, "completed")}>Completed</h1>
         </button>
       </div>
-  );  // ← Add this closing parenthesis and semicolon!
+  );  
 }
 
 export default OrderFilterButtons;
