@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
             role_title
           )
         `)
-        .eq('auth_user_id', authUser.id)
+        .eq('user_id', authUser.id)
         .single()
       
       if (userData) {
@@ -86,13 +86,11 @@ export const AuthProvider = ({ children }) => {
             role_title
           )
         `)
-        .eq('auth_user_id', data.user.id)
+        .eq('user_id', data.user.id)
         .single()
       
       if (userData) {
         // Determine actual role based on role_id
-        // role_id = 1: Customer (user)
-        // role_id > 1: Staff (admin)
         const actualRole = userData.role_id === 1 ? 'user' : 'admin'
         
         // Validate role selection
