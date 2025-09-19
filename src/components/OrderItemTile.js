@@ -1,7 +1,15 @@
 function OrderItemTile({ columns, order, onClick }) {
   return (
     <button
-      onClick={() => onClick(order.cust_id, order.order_id, order.amount, order.status, order.date)}
+      onClick={() =>
+        onClick(
+          order.cust_id,
+          order.order_id,
+          order.amount,
+          order.status,
+          order.date
+        )
+      }
       type="button"
       className="w-full"
     >
@@ -24,6 +32,18 @@ function OrderItemTile({ columns, order, onClick }) {
               case "completed":
                 statusText = "Completed";
                 statusBg = "bg-[#6C7EC2]";
+                break;
+              case "paid":
+                statusText = "Paid";
+                statusBg = "bg-[#74D71D]";
+                break;
+              case "pending":
+                statusText = "In Progress";
+                statusBg = "bg-[#D7891D]";
+                break;
+              case "cancelled":
+                statusText = "Cancelled";
+                statusBg = "bg-[#EA8D8D]";
                 break;
               default:
                 statusText = order.status;
@@ -50,6 +70,5 @@ function OrderItemTile({ columns, order, onClick }) {
     </button>
   );
 }
-
 
 export default OrderItemTile;

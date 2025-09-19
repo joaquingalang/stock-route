@@ -5,6 +5,7 @@ import DashboardPage from "./DashboardPage";
 import OrdersPage from "./OrdersPage";
 import ProductsPage from "./ProductsPage";
 import CreateOrderPage from "./CreateOrderPage";
+import WarehousePage from "./WarehousePage";
 
 function MainPage() {
 
