@@ -39,6 +39,10 @@ function OrderItemDetails({
         statusText = "Completed";
         statusBg = "bg-[#6C7EC2]";
         break;
+      case "rejected":
+        statusText = "Rejected";
+        statusBg = "bg-[#EA8D8D]";
+        break;
       default:
         statusText = status;
         statusBg = "bg-gray-500";
