@@ -8,28 +8,19 @@ function OrderItemDetails({
   amount,
   status,
   date,
+  orderItems = [],
+  retailerLocation = "Location not available"
 }) {
 
   let statusText = "";
   let statusBg = "";
 
-  const orders = [
-    {
-      itemName: "Joaquin",
-      quantity: "1",
-      amount: "5",
-    },
-    {
-      itemName: "Joaquin",
-      quantity: "1",
-      amount: "5",
-    },
-    {
-      itemName: "Joaquin",
-      quantity: "1",
-      amount: "5",
-    },
-  ];
+  // Use the orderItems prop instead of hardcoded data
+  const orders = orderItems.map(item => ({
+    itemName: item.items?.name || "Unknown Item",
+    quantity: item.quantity.toString(),
+    amount: item.total_price?.toFixed(2) || "0.00",
+  }));
 
   if (!show) return null;
 
@@ -48,6 +39,9 @@ function OrderItemDetails({
         statusText = "Completed";
         statusBg = "bg-[#6C7EC2]";
         break;
+      default:
+        statusText = status;
+        statusBg = "bg-gray-500";
     }
   }
 
@@ -67,13 +61,12 @@ function OrderItemDetails({
                 Location
               </h1>
               <h1 className="max-w-xs break-words">
-                Blk 12 Lot 8, Mabini Street, Brgy. San Isidro Quezon City, Metro
-                Manila, 1105 Philippines
+                {retailerLocation}
               </h1>
             </div>
             <div>
               <h1 className="text-end text-xs font-semibold text-gray-400">
-                BILL TO
+                ORDER DATE
               </h1>
               <h1 className="text-end font-bold text-xl">{date}</h1>
               <div
@@ -96,15 +89,22 @@ function OrderItemDetails({
               <h1>Amount</h1>
             </div>
 
-            {/* The more orders, the more rows here. */}
+            {/* Display actual order items */}
             <div className="rounded-b-md overflow-y-auto max-h-50">
-              {orders.map((order) => {
-                return<OrderItemRow
-                  itemName={order.itemName}
-                  quantity={order.quantity}
-                  amount={order.amount}
-                />
-              })}
+              {orders.length > 0 ? (
+                orders.map((order, index) => (
+                  <OrderItemRow
+                    key={`${order_id}-item-${index}`}
+                    itemName={order.itemName}
+                    quantity={order.quantity}
+                    amount={order.amount}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  No items found
+                </div>
+              )}
             </div>
           </div>
 

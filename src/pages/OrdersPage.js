@@ -5,6 +5,7 @@ import OrderTableHeader from "../components/OrderTableHeader";
 import OrderFilterButtons from "../components/OrderFilterButtons";
 import addCircleIcon from "../assets/add_circle_icon.png";
 import { getAllOrders } from "../services/OrderService.js";
+import { getAllRetailers } from "../services/RetailerService.js";
 
 function OrdersPage({ onNavigate }) {
   const [showModal, setShowModal] = useState(false);
@@ -12,6 +13,24 @@ function OrdersPage({ onNavigate }) {
   const [filter, setFilter] = useState("all");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [retailers, setRetailers] = useState([]);
+
+  // Fetch retailers
+  useEffect(() => {
+    const fetchRetailers = async () => {
+      try {
+        const { data, error } = await getAllRetailers();
+        if (error) {
+          console.error('Error fetching retailers:', error);
+        } else {
+          setRetailers(data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching retailers:', error);
+      }
+    };
+    fetchRetailers();
+  }, []);
 
   // Fetch orders from Supabase
   useEffect(() => {
@@ -23,6 +42,7 @@ function OrdersPage({ onNavigate }) {
         if (error) {
           console.error('Error fetching orders:', error);
         } else {
+          console.log('Orders data:', data); // Debug log
           setOrders(data || []);
         }
       } catch (error) {
@@ -46,6 +66,18 @@ function OrdersPage({ onNavigate }) {
     }
   };
 
+  // Function to get retailer name by ID
+  const getRetailerName = (retailerId) => {
+    const retailer = retailers.find(r => r.retailer_id === retailerId);
+    return retailer ? retailer.name : `Retailer ${retailerId}`;
+  };
+
+  // Function to get retailer location by ID
+  const getRetailerLocation = (retailerId) => {
+    const retailer = retailers.find(r => r.retailer_id === retailerId);
+    return retailer ? retailer.location : "Location not available";
+  };
+
   // Function to format order data for display
   const formatOrderForDisplay = (order) => {
     const status = getOrderStatus(order);
@@ -57,7 +89,7 @@ function OrdersPage({ onNavigate }) {
 
     return {
       order_id: `#${order.order_id}`,
-      cust_id: order.retailer_id, // Using retailer_id as customer ID
+      cust_id: order.retailer?.name || getRetailerName(order.retailer_id), // Use retailer name from order or fallback
       amount: order.total_amount ? order.total_amount.toFixed(2) : "0.00",
       date: formattedDate,
       status: status,
@@ -75,20 +107,35 @@ function OrdersPage({ onNavigate }) {
       year: '2-digit'
     });
 
+    // Get retailer location - try multiple approaches
+    let retailerLocation = "Location not available";
+    
+    // First try to get from the order's retailer data
+    if (originalOrder.retailer?.location) {
+      retailerLocation = originalOrder.retailer.location;
+      console.log('Using retailer location from order data:', retailerLocation);
+    } 
+    // Fallback to looking up by retailer_id
+    else if (originalOrder.retailer_id) {
+      retailerLocation = getRetailerLocation(originalOrder.retailer_id);
+      console.log('Using retailer location from lookup:', retailerLocation);
+    }
+
     setSelectedOrder({ 
-      cust_id: originalOrder.retailer_id,
+      cust_id: originalOrder.retailer?.name || getRetailerName(originalOrder.retailer_id),
       order_id: originalOrder.order_id,
       amount: originalOrder.total_amount ? originalOrder.total_amount.toFixed(2) : "0.00",
       status: status,
       date: formattedDate,
-      orderItems: originalOrder.order_items || []
+      orderItems: originalOrder.order_items || [],
+      retailerLocation: retailerLocation
     });
     setShowModal(true);
   };
 
   const columns = [
     { field: "order_id", label: "order_ID" },
-    { field: "cust_id", label: "Retailer_ID" },
+    { field: "cust_id", label: "Retailer" },
     { field: "amount", label: "Amount" },
     { field: "date", label: "Date Ordered" },
     { field: "status", label: "Status"},
