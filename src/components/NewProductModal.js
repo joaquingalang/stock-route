@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CloseIcon from "../assets/close_icon.png";
 import NewSupplyDropdown from "./NewSupplyDropdown";
+import { getAllSuppliers } from '../services/SupplierService.js'
+import { getAllCategories } from '../services/CategoryService.js'
+import { createItem } from '../services/ItemService.js'
 
 function NewProductModal({ onClose }) {
   const [image, setImage] = useState(null);
@@ -10,22 +13,9 @@ function NewProductModal({ onClose }) {
   const [category, setCategory] = useState(null);
   const [price, setPrice] = useState(0.00);
   const [supplier, setSupplier] = useState("");
-
-  const categories = [
-    "Clothing and Fashion",
-    "Appliance and Electronics",
-    "Health and Personal Care",
-    "Crafts and Stationary",
-    "Others",
-  ];
-
-  const suppliers = [
-    "Uniclothes",
-    "Samsing",
-    "Bird",
-    "Mongolo-lloyd",
-    "Aaron's",
-  ];
+  const [suppliers, setSuppliers] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const createdAt = new Date().toLocaleDateString("en-US", {
     year: "numeric",
@@ -42,21 +32,117 @@ function NewProductModal({ onClose }) {
     }
   };
 
+  {/* Fetch Suppliers */}
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await getAllSuppliers();
+        
+        if (error) {
+          console.error('Error fetching suppliers:', error);
+        } else {
+          setSuppliers(data);
+        }
+      } catch (error) {
+        console.error('Error fetching suppliers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSuppliers();
+  }, []);
+
+  {/* Fetch Categories */}
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await getAllCategories();
+        
+        if (error) {
+          console.error('Error fetching categories:', error);
+        } else {
+          setCategories(data);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleRemoveImage = () => {
     setImage(null);
   };
 
-  const handleSave = () => {
-    const productData = {
-      name,
-      desc,
-      quantity,
-      category,
-      createdAt,
-      image,
-    };
-    console.log("Saving Product:", productData);
-    onClose(); // close after save for now
+  // Updated handleSave to actually create the item
+  const handleSave = async () => {
+    // Validation
+    if (!name.trim()) {
+      alert('Please enter a product name');
+      return;
+    }
+    if (!desc.trim()) {
+      alert('Please enter a product description');
+      return;
+    }
+    if (!quantity || quantity <= 0) {
+      alert('Please enter a valid quantity');
+      return;
+    }
+    if (!price || price <= 0) {
+      alert('Please enter a valid price');
+      return;
+    }
+    if (!category) {
+      alert('Please select a category');
+      return;
+    }
+    if (!supplier) {
+      alert('Please select a supplier');
+      return;
+    }
+
+    try {
+      const itemData = {
+        name: name.trim(),
+        description: desc.trim(),
+        unit_price: parseFloat(price),
+        stock_quantity: parseInt(quantity),
+        category_id: category.category_id,
+        supplier_id: supplier.supplier_id
+      };
+
+      console.log("Creating item with data:", itemData);
+
+      if (!itemData.category_id) {
+        alert('Category ID is missing. Please select a category again.');
+        return;
+      }
+      if (!itemData.supplier_id) {
+        alert('Supplier ID is missing. Please select a supplier again.');
+        return;
+      }
+      
+      const { data, error } = await createItem(itemData);
+      
+      if (error) {
+        console.error('Error creating item:', error);
+        alert('Failed to create product. Please try again.');
+        return;
+      }
+
+      console.log("Product created successfully:", data);
+      alert('Product created successfully!');
+      onClose(); // Close modal after successful creation
+      
+    } catch (error) {
+      console.error('Error creating item:', error);
+      alert('Failed to create product. Please try again.');
+    } 
   };
 
   return (
@@ -161,7 +247,7 @@ function NewProductModal({ onClose }) {
             <label className="block text-lg font-semibold text-gray-600 mb-1">
               Supplier
             </label>
-            <NewSupplyDropdown onSelect={() => setSupplier(supplier)} suppliers={suppliers}></NewSupplyDropdown>
+            <NewSupplyDropdown onSelect={(selectedSupplier) => setSupplier(selectedSupplier)} suppliers={suppliers}></NewSupplyDropdown>
           </div>
         </div>
 
@@ -173,7 +259,7 @@ function NewProductModal({ onClose }) {
           <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
               <button
-                key={cat}
+                key={cat.category_id}
                 type="button"
                 onClick={() => setCategory(cat)}
                 className={`px-3 py-1 rounded-full border text-sm ${
@@ -182,7 +268,7 @@ function NewProductModal({ onClose }) {
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                {cat}
+                {cat.name}
               </button>
             ))}
           </div>

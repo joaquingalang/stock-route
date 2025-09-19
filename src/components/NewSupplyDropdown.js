@@ -12,7 +12,7 @@ function NewSupplyDropdown({ onSelect, placeholder = "Select Supplier" , supplie
 
   // Handle option selection
   const handleSelect = (supplier) => {
-    setSelectedValue(supplier);
+    setSelectedValue(supplier.supplier_name);
     setIsOpen(false);
     onSelect(supplier); 
   };
@@ -50,12 +50,12 @@ function NewSupplyDropdown({ onSelect, placeholder = "Select Supplier" , supplie
         <div className="absolute top-full left-0 w-full mt-1 bg-white border rounded-md shadow-lg z-10 overflow-y-auto max-h-30">
           {suppliers.map((supplier) => (
             <button
-              key={supplier}
+              key={supplier.supplier_id}
               type="button"
               onClick={() => handleSelect(supplier)}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 first:rounded-t-md last:rounded-b-md"
             >
-              {supplier}
+              {supplier.supplier_name}
             </button>
           ))}
         </div>
