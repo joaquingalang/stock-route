@@ -6,7 +6,7 @@ import serverIcon from "../assets/server_icon.png";
 import clipboardIcon from "../assets/clipboard_icon.png";
 import logoutIcon from "../assets/logout_icon.png";
 
-function SideNavigationMenu() {
+function SideNavigationMenu({onClick, currentPage}) {
     const { signOut } = useAuth();
 
     const handleLogout = async () => {
@@ -29,9 +29,9 @@ function SideNavigationMenu() {
                 <img src={appLogo} className="p-10"/>
 
                 <div className="mx-10">
-                    <MenuButton icon={gridIcon} selected={true}>Dashboard</MenuButton>
-                    <MenuButton icon={serverIcon}>Products</MenuButton>
-                    <MenuButton icon={clipboardIcon}>Orders</MenuButton>
+                    <MenuButton onClick={() => onClick("dashboard")} icon={gridIcon} selected={currentPage === "dashboard"}>Dashboard</MenuButton>
+                    <MenuButton onClick={() => onClick("products")} icon={serverIcon} selected={currentPage === "products"}>Products</MenuButton>
+                    <MenuButton onClick={() => onClick("orders")} icon={clipboardIcon} selected={currentPage === "orders"}>Orders</MenuButton>
                 </div>
             </div>
 
