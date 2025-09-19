@@ -1,12 +1,15 @@
 import SideNavigationMenu from "../components/SideNavigationMenu";
 import DashboardPage from "./DashboardPage";
+import ProductsPage from "./ProductsPage";
 
 function MainPage() {
     return (
-        <div className="grid grid-cols-20 bg-[#EAEAEA]">
+        <div className="grid grid-cols-20">
+            <div className="col-span-4"></div>
             <SideNavigationMenu></SideNavigationMenu>
-            <DashboardPage></DashboardPage>
-            <h1>1</h1>
+            <ProductsPage></ProductsPage>
+            {/* <DashboardPage></DashboardPage> */}
+            {/* <h1>1</h1>
             <h1>2</h1>
             <h1>3</h1>
             <h1>4</h1>
@@ -25,7 +28,7 @@ function MainPage() {
             <h1>17</h1>
             <h1>18</h1>
             <h1>19</h1>
-            <h1>20</h1>`
+            <h1>20</h1> */}
         </div>
     );
 }
