@@ -241,6 +241,39 @@ export const getPendingApprovalOrders = async () => {
 // UPDATE - Approve order (set approved_by)
 export const approveOrder = async (orderId, approvedBy) => {
   try {
+    // First, get the order with its items to check stock
+    const { data: orderData, error: orderError } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        order_items (
+          order_item_id,
+          quantity,
+          items (
+            item_id,
+            name,
+            stock_quantity
+          )
+        )
+      `)
+      .eq('order_id', orderId)
+      .single()
+
+    if (orderError) throw orderError
+
+    // Check if there's sufficient stock for all items
+    for (const orderItem of orderData.order_items) {
+      if (orderItem.items.stock_quantity < orderItem.quantity) {
+        return { 
+          data: null, 
+          error: { 
+            message: `Insufficient stock for ${orderItem.items.name}. Available: ${orderItem.items.stock_quantity}, Required: ${orderItem.quantity}` 
+          } 
+        }
+      }
+    }
+
+    // If stock is available, proceed with approval
     const { data, error } = await supabase
       .from('orders')
       .update({ approved_by: approvedBy })
@@ -249,6 +282,22 @@ export const approveOrder = async (orderId, approvedBy) => {
       .single()
 
     if (error) throw error
+
+    // Reduce stock quantities for each item in the order
+    const { adjustStockQuantity } = await import('./ItemService.js')
+    
+    for (const orderItem of orderData.order_items) {
+      const { error: stockError } = await adjustStockQuantity(
+        orderItem.item_id, 
+        -orderItem.quantity // Negative value to reduce stock
+      )
+      
+      if (stockError) {
+        console.error(`Error reducing stock for item ${orderItem.item_id}:`, stockError)
+        // Continue with other items even if one fails
+      }
+    }
+
     return { data, error: null }
   } catch (error) {
     console.error('Error approving order:', error)
@@ -496,6 +545,7 @@ export const getBillingOrders = async () => {
         )
       `)
       .not('approved_by', 'is', null)
+      .is('billed_by', null)
       .eq('isCancelled', false)
       .order('order_id', { ascending: true })
 
