@@ -1,70 +1,132 @@
 import OrderItemTile from "../components/OrderItemTile";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OrderItemDetails from "../components/OrderItemDetails";
 import OrderTableHeader from "../components/OrderTableHeader";
 import OrderFilterButtons from "../components/OrderFilterButtons";
+import addCircleIcon from "../assets/add_circle_icon.png";
+import { getAllOrders } from "../services/OrderService.js";
 
-//TODO: make sure to map the length of orders for OrderItemRows in OrderItemDetails.
-
-function OrdersPage() {
+function OrdersPage({ onNavigate }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleOrderClick = (cust_id, order_id, amount, status, date) => {
-    setSelectedOrder({ cust_id, order_id, amount, status, date });
+  // Fetch orders from Supabase
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await getAllOrders();
+        
+        if (error) {
+          console.error('Error fetching orders:', error);
+        } else {
+          setOrders(data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  // Function to determine order status based on approved_by and billed_by
+  const getOrderStatus = (order) => {
+    if (!order.approved_by) {
+      return "progress"; // Waiting for approval - yellow color
+    } else if (!order.billed_by) {
+      return "ready"; // Ready for shipping - green color
+    } else {
+      return "completed"; // Completed - blue color
+    }
+  };
+
+  // Function to format order data for display
+  const formatOrderForDisplay = (order) => {
+    const status = getOrderStatus(order);
+    const formattedDate = new Date(order.created_at).toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: '2-digit'
+    });
+
+    return {
+      order_id: `#${order.order_id}`,
+      cust_id: order.retailer_id, // Using retailer_id as customer ID
+      amount: order.total_amount ? order.total_amount.toFixed(2) : "0.00",
+      date: formattedDate,
+      status: status,
+      // Keep original order data for modal
+      originalOrder: order
+    };
+  };
+
+  const handleOrderClick = (formattedOrder) => {
+    const { originalOrder } = formattedOrder;
+    const status = getOrderStatus(originalOrder);
+    const formattedDate = new Date(originalOrder.created_at).toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: '2-digit'
+    });
+
+    setSelectedOrder({ 
+      cust_id: originalOrder.retailer_id,
+      order_id: originalOrder.order_id,
+      amount: originalOrder.total_amount ? originalOrder.total_amount.toFixed(2) : "0.00",
+      status: status,
+      date: formattedDate,
+      orderItems: originalOrder.order_items || []
+    });
     setShowModal(true);
   };
 
   const columns = [
     { field: "order_id", label: "order_ID" },
-    { field: "cust_id", label: "customer_ID" },
+    { field: "cust_id", label: "Retailer_ID" },
     { field: "amount", label: "Amount" },
     { field: "date", label: "Date Ordered" },
     { field: "status", label: "Status"},
   ];
 
-  const [orders, setOrders] = useState([
+  const filters = [
     {
-      order_id: "#23DFDS",
-      cust_id: "E23",
-      amount: "508.59",
-      date: "01/27/23",
-      status: "ready",
+      value: "all",
+      label: "All Orders"
     },
     {
-      order_id: "#23TRES",
-      cust_id: "E58",
-      amount: "508.59",
-      date: "01/30/23",
-      status: "progress",
+      value: "progress",
+      label: "In Progress"
     },
     {
-      order_id: "#23DFDS",
-      cust_id: "E78",
-      amount: "508.59",
-      date: "01/02/23",
-      status: "completed",
+      value: "ready",
+      label: "Ready For Shipping"
     },
-  ]);
-
-  const filters = [{
-    value: "all",
-    label: "All Orders"
-  },
-  {
-    value: "progress",
-    label: "In Progress"
-  },
-  {
-    value: "ready",
-    label: "Ready For Shipping"
-  },
-  {
-    value: "completed",
-    label: "Completed"
-  },
+    {
+      value: "completed",
+      label: "Completed"
+    },
   ];
+
+  // Filter orders based on selected filter
+  const filteredOrders = filter !== "all" 
+    ? orders.filter(order => getOrderStatus(order) === filter)
+    : orders;
+
+  const displayOrders = filteredOrders.map(formatOrderForDisplay);
+
+  if (loading) {
+    return (
+      <div className="col-span-16 h-screen flex items-center justify-center">
+        <div className="text-lg">Loading orders...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="col-span-16 h-screen">
@@ -75,25 +137,36 @@ function OrdersPage() {
             <div className="grid grid-cols-8 grid-rows-8 gap-5">
               <div className="col-span-12 row-span-10 p-4">
                 <h1 className="font font-semibold text-lg mb-2">Orders</h1>
-                <OrderFilterButtons
-                  currentFilter={filter}
-                  onFilterChange={setFilter}
-                  filters={filters}
-                />
+                <div className="flex justify-between items-center mb-3">
+                  <OrderFilterButtons
+                    currentFilter={filter}
+                    onFilterChange={setFilter}
+                    filters={filters}
+                  />
+                  <button 
+                    onClick={() => onNavigate("createOrder")}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-semibold"
+                  >
+                    <img src={addCircleIcon} alt="Add" className="w-5 h-5" />
+                    Add Order
+                  </button>
+                </div>
                 <OrderTableHeader columns={columns} />
 
                 <div className="overflow-y-auto max-h-150">
-                  {(filter !== "all"
-                    ? orders.filter((order) => order.status === filter)
-                    : orders
-                  ).map((order, index) => (
+                  {displayOrders.map((order, index) => (
                     <OrderItemTile
-                    key={order.order_id + index}
+                      key={order.order_id + index}
                       columns={columns}
                       order={order}
-                      onClick={handleOrderClick}
+                      onClick={() => handleOrderClick(order)}
                     />
                   ))}
+                  {displayOrders.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      No orders found
+                    </div>
+                  )}
                   {showModal && selectedOrder && (
                     <OrderItemDetails
                       show={showModal}

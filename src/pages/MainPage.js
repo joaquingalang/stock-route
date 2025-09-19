@@ -23,7 +23,15 @@ function MainPage() {
             case "products":
                 return <ProductsPage></ProductsPage>;
             case "orders":
+                return <OrdersPage onNavigate={handleNavigation}></OrdersPage>;
+            case "createOrder":
+                return <CreateOrderPage></CreateOrderPage>;
+            case "approvals":
+                return <ApprovalsPage></ApprovalsPage>;
+            case "billings":
                 return <BillingPage></BillingPage>;
+            case "warehouse":
+                return <WarehousePage></WarehousePage>;
         }
     }
 

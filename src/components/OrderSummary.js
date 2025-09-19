@@ -1,4 +1,4 @@
-function OrderSummary({onOrder, subtotal}) {
+function OrderSummary({onOrder, subtotal, isSubmitting = false}) {
 
     // formatter for PHP currency
     const currencyFormatter = new Intl.NumberFormat("en-PH", {
@@ -33,8 +33,17 @@ function OrderSummary({onOrder, subtotal}) {
 
                 <hr className="my-4 bg-[#D9D9D9] h-px border-none"></hr>
 
-                <div className="bg-[#EA948D] rounded-lg w-full flex justify-center items-center cursor-pointer">
-                    <p className="text-white font-semibold py-3">Order Now</p>
+                <div 
+                    className={`rounded-lg w-full flex justify-center items-center ${
+                        isSubmitting 
+                            ? 'bg-gray-400 cursor-not-allowed' 
+                            : 'bg-[#EA948D] cursor-pointer'
+                    }`}
+                    onClick={isSubmitting ? undefined : onOrder}
+                >
+                    <p className="text-white font-semibold py-3">
+                        {isSubmitting ? 'Creating Order...' : 'Order Now'}
+                    </p>
                 </div>
 
             </div>
