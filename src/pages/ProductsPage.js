@@ -79,7 +79,7 @@ function ProductsPage() {
         setSelectedProduct(product);
     }
 
-    const products = productList.map(items => (<ProductCard onClick={() => onProductSelect(items)} image={items.image} name={items.name} id={items.id} desc={items.desc} quantity={items.quantity}></ProductCard>));
+    const products = productList.map(items => (<ProductCard onClick={() => onProductSelect(items)} isSelected={selectedProduct.id === items.id} image={items.image} name={items.name} id={items.id} desc={items.desc} quantity={items.quantity}></ProductCard>));
 
     return (
         <div className="col-span-16 px-10 pt-8 bg-[#EAEAEA]">
