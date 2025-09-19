@@ -1,8 +1,6 @@
-import ShoppingBagIcon from "../assets/shopping_bag_icon.png";
-import InboxIcon from "../assets/inbox_icon.png";
-import GiftIcon from "../assets/gift_icon.png";
-import CoffeeIcon from "../assets/coffee_icon.png";
 import GridIcon from "../assets/grid_icon.png";
+import CloseIcon from "../assets/close_icon.png";
+import XCircleIcon from "../assets/X circle.png";
 import CategoryButton from "../components/CategoryButton";
 import { useEffect, useState } from "react";
 import OrderProductTile from "../components/OrderProductTile";
@@ -14,7 +12,7 @@ import { getAllRetailers } from "../services/RetailerService.js";
 import { createCompleteOrder } from "../services/OrderService.js";
 import { useAuth } from "../contexts/AuthContext.js";
 
-function CreateOrderPage() {
+function CreateOrderPage({ onNavigate }) {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [productList, setProductList] = useState([]);
     const [categoryList, setCategories] = useState([]);
@@ -110,6 +108,12 @@ function CreateOrderPage() {
         setSelectedRetailer(retailer);
     }
 
+    const handleClose = () => {
+        if (onNavigate) {
+            onNavigate("orders");
+        }
+    }
+
     const handleAddToCart = (product) => {
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.item_id === product.item_id);
@@ -200,8 +204,10 @@ function CreateOrderPage() {
                 alert('Failed to create order. Please try again.');
             } else {
                 alert('Order created successfully!');
-                setCart([]); // Clear the cart after successful order creation
-                // You might want to redirect to orders page or show order confirmation
+                setCart([]);
+                if (onNavigate) {
+                    onNavigate("orders");
+                }
             }
         } catch (error) {
             console.error('Error creating order:', error);
@@ -233,7 +239,16 @@ function CreateOrderPage() {
 
     return (
         <div className="col-span-16 px-10 pt-8 h-full bg-[#EAEAEA]">
-            <p className="text-2xl font-semibold">Create Order</p>
+            <div className="flex justify-between items-center mb-4">
+                <p className="text-2xl font-semibold">Create Order</p>
+                <img 
+                    src={XCircleIcon} 
+                    alt="Close" 
+                    className="w-8 h-8 cursor-pointer hover:opacity-70"
+                    onClick={handleClose}
+                    title="Close"
+                />
+            </div>
 
             <div className="flex justify-between">
                 <div className="flex mt-3 mb-5">

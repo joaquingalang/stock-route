@@ -25,7 +25,7 @@ function MainPage() {
             case "orders":
                 return <OrdersPage onNavigate={handleNavigation}></OrdersPage>;
             case "createOrder":
-                return <CreateOrderPage></CreateOrderPage>;
+                return <CreateOrderPage onNavigate={handleNavigation}></CreateOrderPage>;
             case "approvals":
                 return <ApprovalsPage></ApprovalsPage>;
             case "billings":
