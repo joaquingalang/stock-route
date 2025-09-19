@@ -108,7 +108,7 @@ function DashboardPage() {
 
                 {/* Main Dashboard */}
                 <div className="col-span-12">
-                    <div className="m-6">
+                    <div className="mt-6 ml-10 mr-6">
                         
                         <h1 className="font font-semibold text-lg mb-2">Friday, August 22 2025</h1>
                         
