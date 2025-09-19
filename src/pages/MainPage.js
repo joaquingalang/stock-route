@@ -6,6 +6,7 @@ import OrdersPage from "./OrdersPage";
 import ProductsPage from "./ProductsPage";
 import CreateOrderPage from "./CreateOrderPage";
 import WarehousePage from "./WarehousePage";
+import BillingPage from "./BillingPage";
 
 function MainPage() {
 
@@ -22,7 +23,7 @@ function MainPage() {
             case "products":
                 return <ProductsPage></ProductsPage>;
             case "orders":
-                return <OrdersPage></OrdersPage>;
+                return <BillingPage></BillingPage>;
         }
     }
 

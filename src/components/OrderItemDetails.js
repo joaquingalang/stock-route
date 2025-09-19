@@ -98,7 +98,7 @@ function OrderItemDetails({
 
             {/* The more orders, the more rows here. */}
             <div className="rounded-b-md overflow-y-auto max-h-50">
-              {orders.map((order, index) => {
+              {orders.map((order) => {
                 return<OrderItemRow
                   itemName={order.itemName}
                   quantity={order.quantity}

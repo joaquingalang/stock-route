@@ -48,6 +48,24 @@ function OrdersPage() {
     },
   ]);
 
+  const filters = [{
+    value: "all",
+    label: "All Orders"
+  },
+  {
+    value: "progress",
+    label: "In Progress"
+  },
+  {
+    value: "ready",
+    label: "Ready For Shipping"
+  },
+  {
+    value: "completed",
+    label: "Completed"
+  },
+  ];
+
   return (
     <div className="col-span-16 h-screen">
       <div className="grid grid-cols-16">
@@ -60,6 +78,7 @@ function OrdersPage() {
                 <OrderFilterButtons
                   currentFilter={filter}
                   onFilterChange={setFilter}
+                  filters={filters}
                 />
                 <OrderTableHeader columns={columns} />
 
@@ -67,8 +86,9 @@ function OrdersPage() {
                   {(filter !== "all"
                     ? orders.filter((order) => order.status === filter)
                     : orders
-                  ).map((order, idx) => (
+                  ).map((order, index) => (
                     <OrderItemTile
+                    key={order.order_id + index}
                       columns={columns}
                       order={order}
                       onClick={handleOrderClick}

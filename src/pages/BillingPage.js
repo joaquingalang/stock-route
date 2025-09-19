@@ -22,6 +22,25 @@ function ApprovalsPage() {
     { field: "status", label: "Status"},
   ];
 
+  const filters = [
+    {
+      value: "all",
+      label: "All Bills"
+    },
+    {
+      value: "paid",
+      label: "Paid"
+    },
+    {
+      value: "pending", 
+      label: "Pending"
+    },
+    {
+      value: "cancelled",
+      label: "Cancelled"
+    },
+  ];
+
   const [bills, setBills] = useState([
     {
       order_id: "#23DFDS",
@@ -56,6 +75,11 @@ function ApprovalsPage() {
             <div className="grid grid-cols-8 grid-rows-8 gap-5">
               <div className="col-span-12 row-span-10 p-4">
                 <h1 className="font font-semibold text-3xl mb-5">Billing</h1>
+                 <OrderFilterButtons
+        currentFilter={filter}
+        onFilterChange={setFilter}
+        filters={filters}
+      />
                 <OrderTableHeader columns={columns} />
 
                 <div className="overflow-y-auto max-h-150">
@@ -64,6 +88,7 @@ function ApprovalsPage() {
                     : bills
                   ).map((bill, idx) => (
                     <OrderItemTile
+                    key={bill.order_id + idx}
                       columns={columns}
                       order={bill}
                       onClick={handleOrderClick}
