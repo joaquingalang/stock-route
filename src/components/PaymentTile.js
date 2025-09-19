@@ -1,12 +1,12 @@
 import rightArrowIcon from "../assets/right_arrow_icon.png";
 
 function PaymentTile({id, name, orderId}) {
-    let idBg = id % 2 === 0 ? "bg-[#293A7A]" : "bg-[#E36A61]";
+    let idBackgroundColor = id % 2 === 0 ? "bg-[#293A7A]" : "bg-[#E36A61]";
 
     return (
         <div className="flex justify-between mb-3">
             <div className="flex">
-                <div className={"w-12 h-12 rounded-md flex justify-center items-center mr-5 " + idBg}>
+                <div className={"w-12 h-12 rounded-md flex justify-center items-center mr-5 " + idBackgroundColor}>
                     <h1 className="text-sm text-white font-bold">{"E" + id}</h1>
                 </div>
 
