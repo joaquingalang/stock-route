@@ -3,75 +3,89 @@ import InboxIcon from "../assets/inbox_icon.png";
 import GiftIcon from "../assets/gift_icon.png";
 import CoffeeIcon from "../assets/coffee_icon.png";
 import CategoryButton from "../components/CategoryButton";
-import QuinCover from "../assets/quin_cover.png";
-import KyleCover from "../assets/kyle_cover.png";
-import AaronCover from "../assets/aaron_cover.png";
-import LaineCover from "../assets/laine_cover.png";
+// import QuinCover from "../assets/quin_cover.png";
+// import KyleCover from "../assets/kyle_cover.png";
+// import AaronCover from "../assets/aaron_cover.png";
+// import LaineCover from "../assets/laine_cover.png";
 import ProductCard from "../components/ProductCard";
 import { useEffect, useState } from "react";
 import DetailedProductCard from "../components/DetailedProductCard";
+import { bulkUpdateItems, getAllItems } from "../services/ItemService.js";
 
 function ProductsPage() {
-
-
     const [selectedCategory, setSelectedCategory] = useState("shopping");
-    
     const [productList, setProductList] = useState([]);
     const [isProductSelected, setIsProductSelected] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState({});
 
     useEffect(() => {
-        let products = [
-            {
-                image: QuinCover,
-                name: "Joaquin Galang",
-                id: "1024",
-                desc: "Goofy ass looking dumdum that likes DND and bully people.",
-                quantity: 3,
-                category: "clothes",
-                costPrice: 12,
-                sellPrice: 20,
-                createdAt: "2025-08-05",
-                updatedAt: "2025-08-20",
-            },
-            {
-                image: KyleCover,
-                name: "Adrian Mariano",
-                id: "2078",
-                desc: "Racist in his own heritage, likes people with down syndrome and TFT.",
-                quantity: 5,
-                category: "clothes",
-                costPrice: 12,
-                sellPrice: 20,
-                createdAt: "2025-08-05",
-                updatedAt: "2025-08-20",
-            },
-            {
-                image: AaronCover,
-                name: "Aaron Francisco",
-                id: "5093",
-                desc: "Cute Guy that has on a crush on Henry Cavill and is obsessed with body builders",
-                quantity: 12,
-                category: "clothes",
-                costPrice: 12,
-                sellPrice: 20,
-                createdAt: "2025-08-05",
-                updatedAt: "2025-08-20",
-            },
-            {
-                image: LaineCover,
-                name: "Ellaine Gonzales",
-                id: "2035",
-                desc: "Wala cute lang.",
-                quantity: 0,
-                category: "clothes",
-                costPrice: 12,
-                sellPrice: 20,
-                createdAt: "2025-08-05",
-                updatedAt: "2025-08-20",
-            },
-        ];
-        setProductList(products);
+        // let products = [
+        //     {
+        //         image: QuinCover,
+        //         name: "Joaquin Galang",
+        //         id: "1024",
+        //         desc: "Goofy ass looking dumdum that likes DND and bully people.",
+        //         quantity: 3,
+        //         category: "clothes",
+        //         costPrice: 12,
+        //         sellPrice: 20,
+        //         createdAt: "2025-08-05",
+        //         updatedAt: "2025-08-20",
+        //     },
+        //     {
+        //         image: KyleCover,
+        //         name: "Adrian Mariano",
+        //         id: "2078",
+        //         desc: "Racist in his own heritage, likes people with down syndrome and TFT.",
+        //         quantity: 5,
+        //         category: "clothes",
+        //         costPrice: 12,
+        //         sellPrice: 20,
+        //         createdAt: "2025-08-05",
+        //         updatedAt: "2025-08-20",
+        //     },
+        //     {
+        //         image: AaronCover,
+        //         name: "Aaron Francisco",
+        //         id: "5093",
+        //         desc: "Cute Guy that has on a crush on Henry Cavill and is obsessed with body builders",
+        //         quantity: 12,
+        //         category: "clothes",
+        //         costPrice: 12,
+        //         sellPrice: 20,
+        //         createdAt: "2025-08-05",
+        //         updatedAt: "2025-08-20",
+        //     },
+        //     {
+        //         image: LaineCover,
+        //         name: "Ellaine Gonzales",
+        //         id: "2035",
+        //         desc: "Wala cute lang.",
+        //         quantity: 0,
+        //         category: "clothes",
+        //         costPrice: 12,
+        //         sellPrice: 20,
+        //         createdAt: "2025-08-05",
+        //         updatedAt: "2025-08-20",
+        //     },
+        // ];
+
+        const fetchProducts = async () => {
+            try {
+                const { data, error } = await getAllItems();
+                
+                if (error) {
+                  console.error('Error fetching products:', error);
+                } else {
+                  setProductList(data);
+                }
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            } 
+        }
+        fetchProducts();
+
+        // setProductList(products);
     });
 
     const onProductSelect = (product) => {
@@ -79,7 +93,17 @@ function ProductsPage() {
         setSelectedProduct(product);
     }
 
-    const products = productList.map(items => (<ProductCard onClick={() => onProductSelect(items)} isSelected={selectedProduct.id === items.id} image={items.image} name={items.name} id={items.id} desc={items.desc} quantity={items.quantity}></ProductCard>));
+    const products = productList.map(items => (
+        <ProductCard 
+            key={items.item_id} 
+            onClick={() => onProductSelect(items)} 
+            isSelected={selectedProduct.item_id === items.item_id} 
+            image={items.image_url} 
+            name={items.name} 
+            id={items.item_id} 
+            desc={items.description} 
+            quantity={items.stock_quantity}
+        ></ProductCard>));
 
     return (
         <div className="col-span-16 px-10 pt-8 bg-[#EAEAEA]">
@@ -103,15 +127,13 @@ function ProductsPage() {
                 <div className="relative">
                     <DetailedProductCard
                     onClose={() => setIsProductSelected(false)}
-                    image={selectedProduct.image}
+                    image={selectedProduct.image_url}
                     name={selectedProduct.name}
-                    id={selectedProduct.id}
-                    desc={selectedProduct.desc}
-                    quantity={selectedProduct.quantity}
-                    costPrice={selectedProduct.costPrice}
-                    sellPrice={selectedProduct.sellPrice}
+                    id={selectedProduct.item_id}
+                    desc={selectedProduct.description}
+                    quantity={selectedProduct.stock_quantity}
+                    unitPrice={selectedProduct.unit_price}
                     createdAt={selectedProduct.createdAt}
-                    updatedAt={selectedProduct.updatedAt}
                     />
                 </div>
                 )}

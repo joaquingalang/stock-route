@@ -4,6 +4,7 @@ import NewSupplyDropdown from "./NewSupplyDropdown";
 import { getAllSuppliers } from '../services/SupplierService.js'
 import { getAllCategories } from '../services/CategoryService.js'
 import { createItem } from '../services/ItemService.js'
+import { uploadImage } from '../services/ImageService.js'
 
 function NewProductModal({ onClose }) {
   const [image, setImage] = useState(null);
@@ -15,7 +16,7 @@ function NewProductModal({ onClose }) {
   const [supplier, setSupplier] = useState("");
   const [suppliers, setSuppliers] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [imageFile, setImageFile] = useState(null);
 
   const createdAt = new Date().toLocaleDateString("en-US", {
     year: "numeric",
@@ -26,17 +27,35 @@ function NewProductModal({ onClose }) {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (e.g., max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+      }
+
+      setImageFile(file); // Store the file for upload
+      
       const reader = new FileReader();
       reader.onloadend = () => setImage(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
+  const handleRemoveImage = () => {
+    setImage(null);
+    setImageFile(null);
+  };
+
   {/* Fetch Suppliers */}
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        setLoading(true);
         const { data, error } = await getAllSuppliers();
         
         if (error) {
@@ -46,9 +65,7 @@ function NewProductModal({ onClose }) {
         }
       } catch (error) {
         console.error('Error fetching suppliers:', error);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
     fetchSuppliers();
   }, []);
@@ -57,7 +74,6 @@ function NewProductModal({ onClose }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        setLoading(true);
         const { data, error } = await getAllCategories();
         
         if (error) {
@@ -68,15 +84,10 @@ function NewProductModal({ onClose }) {
       } catch (error) {
         console.error('Error fetching categories:', error);
       } finally {
-        setLoading(false);
       }
     };
     fetchCategories();
   }, []);
-
-  const handleRemoveImage = () => {
-    setImage(null);
-  };
 
   // Updated handleSave to actually create the item
   const handleSave = async () => {
@@ -107,13 +118,32 @@ function NewProductModal({ onClose }) {
     }
 
     try {
+      let imageUrl = null;
+
+      // Upload image if one is selected
+      if (imageFile) {
+        console.log("Uploading image...");
+        const { data: uploadData, error: uploadError } = await uploadImage(imageFile);
+        
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          alert('Failed to upload image. Please try again.');
+          return;
+        }
+        
+        imageUrl = uploadData.publicUrl;
+        console.log("Image uploaded successfully:", imageUrl);
+      }
+
+      // Create item with image URL
       const itemData = {
         name: name.trim(),
         description: desc.trim(),
         unit_price: parseFloat(price),
         stock_quantity: parseInt(quantity),
         category_id: category.category_id,
-        supplier_id: supplier.supplier_id
+        supplier_id: supplier.supplier_id,
+        image_url: imageUrl
       };
 
       console.log("Creating item with data:", itemData);

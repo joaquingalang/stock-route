@@ -12,7 +12,8 @@ export const createItem = async (itemData) => {
         unit_price: itemData.unit_price,
         stock_quantity: itemData.stock_quantity,
         category_id: itemData.category_id,
-        supplier_id: itemData.supplier_id
+        supplier_id: itemData.supplier_id,
+        image_url: itemData.image_url
       }])
       .select()
       .single()
@@ -30,14 +31,8 @@ export const getAllItems = async () => {
   try {
     const { data, error } = await supabase
       .from('items')
-      .select(`
-        *,
-        categories:category_id (
-          category_id,
-          category_name
-        )
-      `)
-      .order('created_at', { ascending: false })
+      .select(`*`)
+      .order('item_id', { ascending: true })
 
     if (error) throw error
     return { data, error: null }
@@ -52,13 +47,7 @@ export const getItemById = async (itemId) => {
   try {
     const { data, error } = await supabase
       .from('items')
-      .select(`
-        *,
-        categories:category_id (
-          category_id,
-          category_name
-        )
-      `)
+      .select(`*`)
       .eq('item_id', itemId)
       .single()
 
@@ -172,7 +161,9 @@ export const updateItem = async (itemId, updateData) => {
         description: updateData.description,
         unit_price: updateData.unit_price,
         stock_quantity: updateData.stock_quantity,
-        category_id: updateData.category_id
+        category_id: updateData.category_id,
+        supplier_id: updateData.supplier_id,
+        image_url: updateData.image_url
       })
       .eq('item_id', itemId)
       .select()
