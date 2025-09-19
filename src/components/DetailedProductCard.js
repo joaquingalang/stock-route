@@ -18,10 +18,10 @@ function DetailedProductCard({onClose, image, name, id, desc, quantity, costPric
 
     // formatter for PHP currency
     const currencyFormatter = new Intl.NumberFormat("en-PH", {
-    style: "currency",
-    currency: "PHP",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
     });
 
 

@@ -1,14 +1,39 @@
+import { useState } from "react";
 import SideNavigationMenu from "../components/SideNavigationMenu";
+import ApprovalsPage from "./ApprovalsPage";
 import DashboardPage from "./DashboardPage";
+import OrdersPage from "./OrdersPage";
 import ProductsPage from "./ProductsPage";
+import CreateOrderPage from "./CreateOrderPage";
 
 function MainPage() {
+
+    const [selectedPage, setSelectedPage] = useState("dashboard");
+
+    function handleNavigation(page) {
+        setSelectedPage(page);
+    }
+
+    function currentPage() {
+        switch (selectedPage) {
+            case "dashboard":
+                return <DashboardPage></DashboardPage>;
+            case "products":
+                return <ProductsPage></ProductsPage>;
+            case "orders":
+                return <OrdersPage></OrdersPage>;
+        }
+    }
+
     return (
         <div className="grid grid-cols-20">
             <div className="col-span-4"></div>
-            <SideNavigationMenu></SideNavigationMenu>
-            <ProductsPage></ProductsPage>
-            {/* <DashboardPage></DashboardPage> */}
+            <SideNavigationMenu currentPage={selectedPage} onClick={handleNavigation}></SideNavigationMenu>
+            
+            {/* <CreateOrderPage></CreateOrderPage> */}
+
+            {currentPage()}
+            
             {/* <h1>1</h1>
             <h1>2</h1>
             <h1>3</h1>
