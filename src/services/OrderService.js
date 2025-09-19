@@ -114,7 +114,7 @@ export const getAllOrders = async () => {
           )
         )
       `)
-      .order('created_at', { ascending: false })
+      .order('order_id', { ascending: true })
 
     if (error) throw error
     return { data, error: null }
