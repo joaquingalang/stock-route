@@ -1,4 +1,4 @@
-import ShoppingBagIcon from "../assets/shopping_bag_icon.png";
+import GridIcon from "../assets/grid_icon.png";
 import CategoryButton from "../components/CategoryButton";
 import ProductCard from "../components/ProductCard";
 import { useEffect, useState } from "react";
@@ -97,7 +97,7 @@ function ProductsPage() {
         <CategoryButton 
             key={category.category_id} 
             onClick={() => handleCategorySelect(category.category_id)} 
-            icon={category.icon} 
+            icon={category.icon_url} 
             isSelected={selectedCategory === category.category_id}
         ></CategoryButton>
     ));
@@ -109,7 +109,7 @@ function ProductsPage() {
             <div className="flex mt-3 mb-5">
                 <CategoryButton 
                     onClick={handleShowAllProducts} 
-                    icon={ShoppingBagIcon} 
+                    icon={GridIcon} 
                     isSelected={selectedCategory === null}
                 ></CategoryButton>
                 {categories}
