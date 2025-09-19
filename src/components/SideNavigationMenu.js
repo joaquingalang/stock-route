@@ -16,8 +16,6 @@ function SideNavigationMenu() {
                 console.error('Logout error:', error);
             } else {
                 console.log('Logout successful');
-                // The user will be automatically redirected to sign-in page
-                // due to the auth state change in AuthContext
             }
         } catch (err) {
             console.error('Unexpected logout error:', err);
@@ -25,7 +23,7 @@ function SideNavigationMenu() {
     };
 
     return (
-        <div className="col-span-4 h-screen bg-[#FFFFFF] flex flex-col justify-between shadow-[10px_0px_15px_-10px_rgba(0,0,0,0.3)]">
+        <div className="fixed top-0 left-0 h-screen w-86 bg-[#FFFFFF] flex flex-col justify-between shadow-[10px_0px_15px_-10px_rgba(0,0,0,0.3)]">
 
             <div className="flex flex-col items-center">
                 <img src={appLogo} className="p-10"/>
@@ -35,13 +33,11 @@ function SideNavigationMenu() {
                     <MenuButton icon={serverIcon}>Products</MenuButton>
                     <MenuButton icon={clipboardIcon}>Orders</MenuButton>
                 </div>
-
             </div>
 
             <div className="mx-10">
                 <MenuButton icon={logoutIcon} onClick={handleLogout}>Logout</MenuButton>
             </div>
-
         </div>
     );
 }
