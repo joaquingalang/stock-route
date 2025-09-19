@@ -17,7 +17,7 @@ function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState("shopping");
     
     const [productList, setProductList] = useState([]);
-    const [isProductSelected, setIsProductSelected] = useState(true);
+    const [isProductSelected, setIsProductSelected] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState({});
 
     useEffect(() => {
