@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CloseIcon from "../assets/close_icon.png";
+import NewSupplyDropdown from "./NewSupplyDropdown";
 
 function NewProductModal({ onClose }) {
   const [image, setImage] = useState(null);
@@ -7,16 +8,23 @@ function NewProductModal({ onClose }) {
   const [desc, setDesc] = useState("");
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] = useState(null);
+  const [price, setPrice] = useState(0.00);
+  const [supplier, setSupplier] = useState("");
 
   const categories = [
-    "Shoes",
-    "Clothes",
-    "Make-up",
-    "Food",
-    "Electronics",
-    "Accessories",
-    "Home",
+    "Clothing and Fashion",
+    "Appliance and Electronics",
+    "Health and Personal Care",
+    "Crafts and Stationary",
     "Others",
+  ];
+
+  const suppliers = [
+    "Uniclothes",
+    "Samsing",
+    "Bird",
+    "Mongolo-lloyd",
+    "Aaron's",
   ];
 
   const createdAt = new Date().toLocaleDateString("en-US", {
@@ -59,7 +67,7 @@ function NewProductModal({ onClose }) {
           onClick={onClose}
           className="absolute cursor-pointer bg-white rounded-2xl p-1 -top-3 -right-3 text-gray-500 hover:text-gray-800 text-xl"
         >
-          <img src={CloseIcon} className="w-6"/>
+          <img src={CloseIcon} className="w-6" />
         </button>
 
         {/* Upload Panel */}
@@ -119,19 +127,42 @@ function NewProductModal({ onClose }) {
           ></textarea>
         </div>
 
-        {/* Quantity */}
-        <div className="mb-4">
-          <label className="block text-lg font-semibold text-gray-600 mb-1">
-            Product Quantity
-          </label>
-          <input
-            type="number"
-            min="0"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            className="w-32 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Units"
-          />
+        <div className="mb-4 flex justify-between">
+          {/* Quantity */}
+          <div>
+            <label className="block text-lg font-semibold text-gray-600 mb-1">
+              Product Quantity
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              className="w-32 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Units"
+            />
+          </div>
+          {/* Price */}
+          <div>
+            <label className="block text-lg font-semibold text-gray-600 mb-1">
+              Product Price
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="w-32 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="$0.00"
+            />
+          </div>
+          {/* Supply Dropdown*/}
+          <div>
+            <label className="block text-lg font-semibold text-gray-600 mb-1">
+              Supplier
+            </label>
+            <NewSupplyDropdown onSelect={() => setSupplier(supplier)} suppliers={suppliers}></NewSupplyDropdown>
+          </div>
         </div>
 
         {/* Categories */}
