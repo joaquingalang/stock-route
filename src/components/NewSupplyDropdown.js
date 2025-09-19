@@ -41,7 +41,7 @@ function NewSupplyDropdown({ onSelect, placeholder = "Select Supplier" , supplie
           {selectedValue || placeholder}
         </span>
         <span className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}>
-          ▼
+          
         </span>
       </button>
 
