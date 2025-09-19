@@ -11,7 +11,8 @@ export const createItem = async (itemData) => {
         description: itemData.description,
         unit_price: itemData.unit_price,
         stock_quantity: itemData.stock_quantity,
-        category_id: itemData.category_id
+        category_id: itemData.category_id,
+        supplier_id: itemData.supplier_id
       }])
       .select()
       .single()
