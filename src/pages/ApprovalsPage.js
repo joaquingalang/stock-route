@@ -143,7 +143,7 @@ function ApprovalsPage() {
     }
   };
 
-  const handleCancel = () => {
+  const handleClose = () => {
     setShowModal(false);
   };
 
@@ -201,10 +201,11 @@ function ApprovalsPage() {
                   {showModal && selectedOrder && (
                     <ApprovalItemDetails
                       show={showModal}
+                      action="Assignment"
                       onClick={() => setShowModal(false)}
                       onApprove={handleApprove}
                       onReject={handleReject}
-                      onCancel={handleCancel}
+                      onClose={handleClose}
                       {...selectedOrder}
                     />
                   )}

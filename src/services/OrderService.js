@@ -241,6 +241,39 @@ export const getPendingApprovalOrders = async () => {
 // UPDATE - Approve order (set approved_by)
 export const approveOrder = async (orderId, approvedBy) => {
   try {
+    // First, get the order with its items to check stock
+    const { data: orderData, error: orderError } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        order_items (
+          order_item_id,
+          quantity,
+          items (
+            item_id,
+            name,
+            stock_quantity
+          )
+        )
+      `)
+      .eq('order_id', orderId)
+      .single()
+
+    if (orderError) throw orderError
+
+    // Check if there's sufficient stock for all items
+    for (const orderItem of orderData.order_items) {
+      if (orderItem.items.stock_quantity < orderItem.quantity) {
+        return { 
+          data: null, 
+          error: { 
+            message: `Insufficient stock for ${orderItem.items.name}. Available: ${orderItem.items.stock_quantity}, Required: ${orderItem.quantity}` 
+          } 
+        }
+      }
+    }
+
+    // If stock is available, proceed with approval
     const { data, error } = await supabase
       .from('orders')
       .update({ approved_by: approvedBy })
@@ -249,6 +282,22 @@ export const approveOrder = async (orderId, approvedBy) => {
       .single()
 
     if (error) throw error
+
+    // Reduce stock quantities for each item in the order
+    const { adjustStockQuantity } = await import('./ItemService.js')
+    
+    for (const orderItem of orderData.order_items) {
+      const { error: stockError } = await adjustStockQuantity(
+        orderItem.item_id, 
+        -orderItem.quantity // Negative value to reduce stock
+      )
+      
+      if (stockError) {
+        console.error(`Error reducing stock for item ${orderItem.item_id}:`, stockError)
+        // Continue with other items even if one fails
+      }
+    }
+
     return { data, error: null }
   } catch (error) {
     console.error('Error approving order:', error)
@@ -283,15 +332,51 @@ export const rejectOrder = async (orderId) => {
 // UPDATE - Bill order (set billed_by)
 export const billOrder = async (orderId, billedBy) => {
   try {
-    const { data, error } = await supabase
+    // First get the order with its items to know what quantities to reduce
+    const { data: orderData, error: orderError } = await supabase
+      .from('orders')
+      .select(`
+        order_items (
+          item_id,
+          quantity,
+          items (
+            item_id,
+            name,
+            stock_quantity
+          )
+        )
+      `)
+      .eq('order_id', orderId)
+      .single()
+
+    if (orderError) throw orderError
+
+    // Update the order to set billed_by
+    const { data: orderUpdate, error: orderUpdateError } = await supabase
       .from('orders')
       .update({ billed_by: billedBy })
       .eq('order_id', orderId)
       .select()
       .single()
 
-    if (error) throw error
-    return { data, error: null }
+    if (orderUpdateError) throw orderUpdateError
+
+    // Reduce stock quantities for each item in the order
+    const { adjustStockQuantity } = await import('./ItemService.js')
+    
+    for (const orderItem of orderData.order_items) {
+      const { error: stockError } = await adjustStockQuantity(
+        orderItem.item_id, 
+        -orderItem.quantity // Negative value to reduce stock
+      )
+      
+      if (stockError) {
+        console.error(`Error reducing stock for item ${orderItem.item_id}:`, stockError)
+        // Continue with other items even if one fails
+      }
+    }
+
+    return { data: orderUpdate, error: null }
   } catch (error) {
     console.error('Error billing order:', error)
     return { data: null, error }
@@ -413,6 +498,61 @@ export const getOrdersByDateRange = async (startDate, endDate) => {
     return { data, error: null }
   } catch (error) {
     console.error('Error fetching orders by date range:', error)
+    return { data: null, error }
+  }
+}
+
+// UPDATE - Cancel order (set isCancelled to true)
+export const cancelOrder = async (orderId) => {
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ isCancelled: true })
+      .eq('order_id', orderId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return { data, error: null }
+  } catch (error) {
+    console.error('Error cancelling order:', error)
+    return { data: null, error }
+  }
+}
+
+// READ - Get orders for billing (approved orders that are not cancelled)
+export const getBillingOrders = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        retailer:retailer_id (
+          retailer_id,
+          name,
+          location
+        ),
+        order_items (
+          order_item_id,
+          quantity,
+          total_price,
+          items (
+            item_id,
+            name,
+            unit_price,
+            image_url
+          )
+        )
+      `)
+      .not('approved_by', 'is', null)
+      .is('billed_by', null)
+      .eq('isCancelled', false)
+      .order('order_id', { ascending: true })
+
+    if (error) throw error
+    return { data, error: null }
+  } catch (error) {
+    console.error('Error fetching billing orders:', error)
     return { data: null, error }
   }
 }

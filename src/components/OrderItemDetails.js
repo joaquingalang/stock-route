@@ -35,8 +35,8 @@ function OrderItemDetails({
         statusText = "In Progress";
         statusBg = "bg-[#CCD042]";
         break;
-      case "completed":
-        statusText = "Completed";
+      case "paid":
+        statusText = "Paid";
         statusBg = "bg-[#6C7EC2]";
         break;
       case "rejected":

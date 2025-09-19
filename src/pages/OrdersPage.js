@@ -60,12 +60,15 @@ function OrdersPage({ onNavigate }) {
   const getOrderStatus = (order) => {
     if (!order.approved_by && !order.isRejected) {
       return "progress"; // Waiting for approval - yellow color
-    } else if (!order.billed_by && !order.isRejected) {
+    } 
+    if (!order.billed_by && !order.isRejected) {
       return "ready"; // Ready for shipping - green color
-    } else if (order.isRejected) {
+    }
+    if (order.isRejected) {
       return "rejected"; // Rejected - red color
-    } else {
-      return "completed"; // Completed - blue color
+    }
+    if (order.billed_by && !order.isRejected) {
+      return "paid"; // Completed - blue color
     } 
   };
 
@@ -165,8 +168,8 @@ function OrdersPage({ onNavigate }) {
       label: "Ready For Shipping"
     },
     {
-      value: "completed",
-      label: "Completed"
+      value: "paid",
+      label: "Paid"
     },
     {
       value: "rejected",
