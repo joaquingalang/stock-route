@@ -45,6 +45,10 @@ function OrderItemTile({ columns, order, onClick }) {
                 statusText = "Cancelled";
                 statusBg = "bg-[#EA8D8D]";
                 break;
+              case "rejected":
+                statusText = "Rejected";
+                statusBg = "bg-[#EA8D8D]";
+                break;
               default:
                 statusText = order.status;
                 statusBg = "bg-gray-400";

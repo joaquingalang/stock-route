@@ -6,6 +6,7 @@ import OrderFilterButtons from "../components/OrderFilterButtons";
 import addCircleIcon from "../assets/add_circle_icon.png";
 import { getAllOrders } from "../services/OrderService.js";
 import { getAllRetailers } from "../services/RetailerService.js";
+import { useRole } from "../hooks/useRole.js";
 
 function OrdersPage({ onNavigate }) {
   const [showModal, setShowModal] = useState(false);
@@ -14,6 +15,7 @@ function OrdersPage({ onNavigate }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [retailers, setRetailers] = useState([]);
+  const { roleId } = useRole();
 
   // Fetch retailers
   useEffect(() => {
@@ -42,7 +44,6 @@ function OrdersPage({ onNavigate }) {
         if (error) {
           console.error('Error fetching orders:', error);
         } else {
-          console.log('Orders data:', data); // Debug log
           setOrders(data || []);
         }
       } catch (error) {
@@ -57,13 +58,15 @@ function OrdersPage({ onNavigate }) {
 
   // Function to determine order status based on approved_by and billed_by
   const getOrderStatus = (order) => {
-    if (!order.approved_by) {
+    if (!order.approved_by && !order.isRejected) {
       return "progress"; // Waiting for approval - yellow color
-    } else if (!order.billed_by) {
+    } else if (!order.billed_by && !order.isRejected) {
       return "ready"; // Ready for shipping - green color
+    } else if (order.isRejected) {
+      return "rejected"; // Rejected - red color
     } else {
       return "completed"; // Completed - blue color
-    }
+    } 
   };
 
   // Function to get retailer name by ID
@@ -93,7 +96,6 @@ function OrdersPage({ onNavigate }) {
       amount: order.total_amount ? order.total_amount.toFixed(2) : "0.00",
       date: formattedDate,
       status: status,
-      // Keep original order data for modal
       originalOrder: order
     };
   };
@@ -106,6 +108,12 @@ function OrdersPage({ onNavigate }) {
       day: '2-digit',
       year: '2-digit'
     });
+
+    // Debug logging
+    console.log('Original order:', originalOrder);
+    console.log('Order retailer data:', originalOrder.retailer);
+    console.log('Retailer ID:', originalOrder.retailer_id);
+    console.log('All retailers:', retailers);
 
     // Get retailer location - try multiple approaches
     let retailerLocation = "Location not available";
@@ -120,6 +128,8 @@ function OrdersPage({ onNavigate }) {
       retailerLocation = getRetailerLocation(originalOrder.retailer_id);
       console.log('Using retailer location from lookup:', retailerLocation);
     }
+
+    console.log('Final retailer location:', retailerLocation);
 
     setSelectedOrder({ 
       cust_id: originalOrder.retailer?.name || getRetailerName(originalOrder.retailer_id),
@@ -158,6 +168,10 @@ function OrdersPage({ onNavigate }) {
       value: "completed",
       label: "Completed"
     },
+    {
+      value: "rejected",
+      label: "Rejected"
+    },
   ];
 
   // Filter orders based on selected filter
@@ -190,13 +204,15 @@ function OrdersPage({ onNavigate }) {
                     onFilterChange={setFilter}
                     filters={filters}
                   />
-                  <button 
+                  {roleId === 1 && (
+                    <button 
                     onClick={() => onNavigate("createOrder")}
                     className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-semibold"
                   >
                     <img src={addCircleIcon} alt="Add" className="w-5 h-5" />
                     Add Order
                   </button>
+                  )}
                 </div>
                 <OrderTableHeader columns={columns} />
 
