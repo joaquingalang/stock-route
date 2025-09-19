@@ -29,13 +29,9 @@ function OrderItemTile({ columns, order, onClick }) {
                 statusText = "In Progress";
                 statusBg = "bg-[#CCD042]";
                 break;
-              case "completed":
-                statusText = "Completed";
-                statusBg = "bg-[#6C7EC2]";
-                break;
               case "paid":
                 statusText = "Paid";
-                statusBg = "bg-[#74D71D]";
+                statusBg = "bg-[#6C7EC2]";
                 break;
               case "pending":
                 statusText = "In Progress";

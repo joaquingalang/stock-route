@@ -2,10 +2,12 @@ import OrderItemRow from "./OrderItemRow";
 
 function ApprovalItemDetails({
   show,
+  action,
   onClick,
   onApprove,
   onReject,
   onCancel,
+  onClose,
   cust_id,
   order_id,
   amount,
@@ -27,7 +29,7 @@ function ApprovalItemDetails({
       <div className="bg-white p-8 rounded-lg shadow-lg">
         <div className="grid grid-cols-3 gap-8">
           <div>
-            <h1 className="font-bold">Approval Request</h1>
+            <h1 className="font-bold"> {action} Approval Request</h1>
             <h1 className="font-bold">Order ID: {order_id}</h1>
           </div>
           <div className="col-span-3 bg-[#eff6ff] border-1 border-[#d1e5ff] rounded-md p-3">
@@ -86,15 +88,15 @@ function ApprovalItemDetails({
         <div className="col-span-2 flex justify-end gap-3">
           <button
             className="mt-4 px-4 py-2 bg-red-500 text-white rounded border-1 hover:bg-red-600"
-            onClick={onReject}
+            onClick={action === "Assignment" ? onReject : onCancel}
           >
-            Decline
+            {action === "Assignment" ? "Decline" : "Cancel"}
           </button>
           <button
             className="mt-4 px-4 py-2 bg-gray-500 text-white rounded border-1 hover:bg-gray-600"
-            onClick={onCancel}
+            onClick={onClose}
           >
-            Cancel
+            Close
           </button>
           <button
             className="mt-4 px-4 py-2 text-white bg-[#293A7A] rounded border-1 hover:bg-blue-500"
