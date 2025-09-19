@@ -97,6 +97,11 @@ export const getAllOrders = async () => {
       .from('orders')
       .select(`
         *,
+        retailer:retailer_id (
+          retailer_id,
+          name,
+          location
+        ),
         order_items (
           order_item_id,
           quantity,
@@ -109,7 +114,7 @@ export const getAllOrders = async () => {
           )
         )
       `)
-      .order('order_id', { ascending: true })
+      .order('created_at', { ascending: false })
 
     if (error) throw error
     return { data, error: null }
@@ -126,6 +131,11 @@ export const getOrderById = async (orderId) => {
       .from('orders')
       .select(`
         *,
+        retailer:retailer_id (
+          retailer_id,
+          name,
+          location
+        ),
         order_items (
           order_item_id,
           quantity,
@@ -145,44 +155,6 @@ export const getOrderById = async (orderId) => {
     return { data, error: null }
   } catch (error) {
     console.error('Error fetching order:', error)
-    return { data: null, error }
-  }
-}
-
-// READ - Get orders by status (pending, approved, billed)
-export const getOrdersByStatus = async (status) => {
-  try {
-    let query = supabase
-      .from('orders')
-      .select(`
-        *,
-        order_items (
-          order_item_id,
-          quantity,
-          total_price,
-          items (
-            item_id,
-            name,
-            unit_price,
-            image_url
-          )
-        )
-      `)
-
-    if (status === 'pending') {
-      query = query.is('approved_by', null)
-    } else if (status === 'approved') {
-      query = query.not('approved_by', 'is', null).is('billed_by', null)
-    } else if (status === 'billed') {
-      query = query.not('billed_by', 'is', null)
-    }
-
-    const { data, error } = await query.order('created_at', { ascending: false })
-
-    if (error) throw error
-    return { data, error: null }
-  } catch (error) {
-    console.error('Error fetching orders by status:', error)
     return { data: null, error }
   }
 }
