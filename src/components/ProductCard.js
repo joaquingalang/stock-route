@@ -22,7 +22,7 @@ function ProductCard({onClick, isSelected, image, name, id, desc, quantity}) {
             <div className={"bg-white w-full h-50 rounded-b-xl shadow-2xl " + (isSelected && "border-x-2 border-b-2 border-[#D72A1D]")}>
                 <div className="p-5">
                     <p className="text-xl font-semibold mb-2">{name}</p>
-                    <p className="text-sm text-gray-500 font-regular mb-1">Product ID: <span className="font-semibold text-[#293A7A]">PRD-{id}</span></p>
+                    <p className="text-sm text-gray-500 font-regular mb-1">Product ID: <span className="font-semibold text-[#293A7A]">{id}</span></p>
                     <p className="text-sm text-gray-500 font-regular mb-1">Description: <span className="font-semibold text-[#293A7A]">{desc}</span></p>
                     <div className="flex items-center mb-1">
                         <div className={"w-2 h-2 rounded-md ml-0.75 mr-3 mt-0.4 " + backgroundColor}></div>
