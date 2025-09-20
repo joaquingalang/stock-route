@@ -6,7 +6,7 @@ import { getAllCategories } from "../services/CategoryService.js";
 import { createItem } from "../services/ItemService.js";
 import { uploadImage } from "../services/ImageService.js";
 
-function NewProductModal({ onClose }) {
+function NewProductModal({ onClose, onProductCreated }) {
   const [image, setImage] = useState(null);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
@@ -104,10 +104,6 @@ function NewProductModal({ onClose }) {
       alert("Please enter a product description");
       return;
     }
-    if (!quantity || quantity <= 0) {
-      alert("Please enter a valid quantity");
-      return;
-    }
     if (!price || price <= 0) {
       alert("Please enter a valid price");
       return;
@@ -146,7 +142,7 @@ function NewProductModal({ onClose }) {
         name: name.trim(),
         description: desc.trim(),
         unit_price: parseFloat(price),
-        stock_quantity: parseInt(quantity),
+        stock_quantity: 0,
         category_id: category.category_id,
         supplier_id: supplier.supplier_id,
         image_url: imageUrl,
@@ -173,6 +169,12 @@ function NewProductModal({ onClose }) {
 
       console.log("Product created successfully:", data);
       alert("Product created successfully!");
+      
+      // Call the callback function to refresh products list
+      if (onProductCreated) {
+        onProductCreated();
+      }
+      
       onClose(); // Close modal after successful creation
     } catch (error) {
       console.error("Error creating item:", error);
@@ -249,20 +251,6 @@ function NewProductModal({ onClose }) {
         </div>
 
         <div className="mb-4 flex justify-between">
-          {/* Quantity */}
-          <div>
-            <label className="block text-lg font-semibold text-gray-600 mb-1">
-              Product Quantity
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className="w-32 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Units"
-            />
-          </div>
           {/* Price */}
           <div>
             <label className="block text-lg font-semibold text-gray-600 mb-1">

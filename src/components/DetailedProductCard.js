@@ -1,18 +1,18 @@
 import CloseIcon from "../assets/close_icon.png";
 
-function DetailedProductCard({onClose, image, name, id, desc, quantity, costPrice, sellPrice, createdAt, updatedAt}) {
+function DetailedProductCard({onClose, image, name, id, desc, quantity, unitPrice, category, createdAt}) {
 
-    let quanityStatus = "";
+    let quantityStatus = "";
     let backgroundColor = "";
 
     if (quantity === 0) {
-        quanityStatus = "Out of Stock";
+        quantityStatus = "Out of Stock";
         backgroundColor = "bg-[#D72A1D]";
     } else if (quantity >= 1 && quantity <= 5) {
-        quanityStatus = "Low in Stock";
+        quantityStatus = "Low in Stock";
         backgroundColor = "bg-[#CCD042]";
     } else {
-        quanityStatus = "In Stock";
+        quantityStatus = "In Stock";
         backgroundColor = "bg-[#60A32D]";
     }
 
@@ -24,29 +24,39 @@ function DetailedProductCard({onClose, image, name, id, desc, quantity, costPric
         maximumFractionDigits: 2,
     });
 
+    // Format date
+    const formatDate = (dateString) => {
+        if (!dateString) return "N/A";
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    };
 
     return (
         <div className="sticky top-20 w-full">
             <div onClick={() => onClose()} className="bg-white rounded-2xl p-1 absolute -right-2 -top-2 cursor-pointer">
                 <img src={CloseIcon} className="w-6"/>
             </div>
-            <img src={image} className="object-cover rounded-t-xl w-full h-60"></img>
+            <img src={image || "/placeholder-image.png"} className="object-cover rounded-t-xl w-full h-60"></img>
             <div className="bg-white w-full rounded-b-xl shadow-2xl">
                 <div className="p-5">
-                    <p className="text-xl font-semibold mb-2">{name}</p>
-                    <p className="text-sm text-gray-500 font-regular mb-1">Product ID: <span className="font-semibold text-[#293A7A]">PRD-{id}</span></p>
-                    <p className="text-sm text-gray-500 font-regular mb-1">Description: <span className="font-semibold text-[#293A7A]">{desc}</span></p>
+                    <p className="text-xl font-semibold mb-2">{name || "N/A"}</p>
+                    <p className="text-sm text-gray-500 font-regular mb-1">Product ID: <span className="font-semibold text-[#293A7A]">{id || "N/A"}</span></p>
+                    <p className="text-sm text-gray-500 font-regular mb-1">Description: <span className="font-semibold text-[#293A7A]">{desc || "N/A"}</span></p>
                     <div className="flex items-center mb-1">
                         <p className="text-sm text-gray-500 font-regular mr-3">Status: </p>
                         <div className={"rounded-lg px-2 py-0.5 " + backgroundColor}>
-                            <p className="text-sm text-white font-semibold">{quanityStatus}</p>
+                            <p className="text-sm text-white font-semibold">{quantityStatus}</p>
                         </div>
                     </div>
-                    <p className="text-sm text-gray-500 font-regular">Quantity in Stock: <span span className="font-semibold text-[#293A7A] ml-2">{quantity} Units</span></p>
+                    <p className="text-sm text-gray-500 font-regular">Quantity in Stock: <span className="font-semibold text-[#293A7A] ml-2">{quantity || 0} Units</span></p>
                     <div className="flex items-center mb-1">
                         <p className="text-sm text-gray-500 font-regular mr-3">Category: </p>
                         <div className={"rounded-lg px-2 py-0.5 bg-[#E6C4C4]"}>
-                            <p className="text-sm text-[#D72A1D] font-semibold">Clothes</p>
+                            <p className="text-sm text-[#D72A1D] font-semibold">{category || "N/A"}</p>
                         </div>
                     </div>
 
@@ -54,25 +64,16 @@ function DetailedProductCard({onClose, image, name, id, desc, quantity, costPric
 
                     <p className="text-xl font-semibold mb-2">Price</p>
                     <p className="text-sm text-gray-500 font-regular">
-                    Cost Price:
-                    <span className="font-semibold text-[#293A7A] ml-2">
-                        {currencyFormatter.format(costPrice)}
-                    </span>
+                        Unit Price:
+                        <span className="font-semibold text-[#293A7A] ml-2">
+                            {unitPrice ? currencyFormatter.format(unitPrice) : "₱0.00"}
+                        </span>
                     </p>
-
-                    <p className="text-sm text-gray-500 font-regular">
-                    Selling Price:
-                    <span className="font-semibold text-[#293A7A] ml-2">
-                        {currencyFormatter.format(sellPrice)}
-                    </span>
-                    </p>
-
 
                     <hr className="my-3 bg-[#D9D9D9] h-px border-none"></hr>
 
                     <p className="text-xl font-semibold mb-2">History</p>
-                    <p className="text-sm text-gray-500 font-regular">Date Added: <span span className="font-semibold text-[#293A7A] ml-2">{createdAt}</span></p>
-                    <p className="text-sm text-gray-500 font-regular mb-2">Last Updated: <span span className="font-semibold text-[#293A7A] ml-2">{updatedAt}</span></p>
+                    <p className="text-sm text-gray-500 font-regular">Date Added: <span className="font-semibold text-[#293A7A] ml-2">{formatDate(createdAt)}</span></p>
 
                 </div>
             </div>
