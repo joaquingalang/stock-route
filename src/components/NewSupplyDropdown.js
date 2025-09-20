@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-function NewSupplyDropdown({ onSelect, placeholder = "Select Supplier" , suppliers }) {
+function NewSupplyDropdown({ onSelect, placeholder = "Select Option", suppliers}) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
   const dropdownRef = useRef(null);
@@ -11,10 +11,10 @@ function NewSupplyDropdown({ onSelect, placeholder = "Select Supplier" , supplie
   };
 
   // Handle option selection
-  const handleSelect = (supplier) => {
-    setSelectedValue(supplier.supplier_name);
+  const handleSelect = (item) => {
+    setSelectedValue(item.supplier_name || item.product_name);
     setIsOpen(false);
-    onSelect(supplier); 
+    onSelect(item); 
   };
 
   // Close when clicking outside
@@ -29,6 +29,11 @@ function NewSupplyDropdown({ onSelect, placeholder = "Select Supplier" , supplie
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Add null check for suppliers
+  if (!suppliers || !Array.isArray(suppliers)) {
+    return <div>No options available</div>;
+  }
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Dropdown Button */}
@@ -41,21 +46,21 @@ function NewSupplyDropdown({ onSelect, placeholder = "Select Supplier" , supplie
           {selectedValue || placeholder}
         </span>
         <span className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}>
-          
+          ▼
         </span>
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
         <div className="absolute top-full left-0 w-full mt-1 bg-white border rounded-md shadow-lg z-10 overflow-y-auto max-h-30">
-          {suppliers.map((supplier) => (
+          {suppliers.map((item, index) => (
             <button
-              key={supplier.supplier_id}
+              key={item.supplier_id || item.product_id}
               type="button"
-              onClick={() => handleSelect(supplier)}
+              onClick={() => handleSelect(item)}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 first:rounded-t-md last:rounded-b-md"
             >
-              {supplier.supplier_name}
+              {`${index + 1} - (${item.supplier_name || item.product_name})`}
             </button>
           ))}
         </div>
