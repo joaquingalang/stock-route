@@ -4,11 +4,11 @@ import { useAuth } from '../contexts/AuthContext';
 function SignInForm() {
     const { signIn } = useAuth();
     const [formData, setFormData] = useState({
-      role: '',
+      role: 'admin',
       email: '',
       password: ''
     });
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -20,27 +20,13 @@ function SignInForm() {
         }));
     };
 
-    const handleRoleSelect = (role) => {
-        setFormData(prev => ({
-            ...prev,
-            role: role
-        }));
-        setIsDropdownOpen(false);
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
     
-        if (!formData.role) {
-            setError('Please select a role');
-            setLoading(false);
-            return;
-        }
-    
         try {
-            const { data, error } = await signIn(formData.email, formData.password, formData.role);
+            const { data, error } = await signIn(formData.email, formData.password, "admin");
           
             if (error) {
                 setError(error.message);
@@ -62,42 +48,6 @@ function SignInForm() {
                     {error}
                 </div>
             )}
-
-            {/* Role Selection Dropdown */}
-            <div className="relative">
-                <button
-                    type="button"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="w-full px-4 sm:px-5 md:px-6 py-3 sm:py-4 md:py-5 bg-gray-100 rounded-lg sm:rounded-xl text-left text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-lg"
-                >
-                {formData.role || 'Select Role'}
-                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </span>
-                </button>
-                
-                {/* Dropdown Menu */}
-                {isDropdownOpen && (
-                <div className="absolute z-10 w-full mt-1 sm:mt-2 bg-white border border-gray-200 rounded-lg sm:rounded-xl shadow-lg">
-                    <button
-                        type="button"
-                        onClick={() => handleRoleSelect('user')}
-                        className="w-full px-4 sm:px-5 md:px-6 py-3 sm:py-4 text-left hover:bg-gray-100 rounded-t-lg sm:rounded-t-xl text-base sm:text-lg"
-                    >
-                        User
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => handleRoleSelect('admin')}
-                        className="w-full px-4 sm:px-5 md:px-6 py-3 sm:py-4 text-left hover:bg-gray-100 rounded-b-lg sm:rounded-b-xl text-base sm:text-lg"
-                    >
-                        Admin
-                    </button>
-                </div>
-                )}
-            </div>
 
             {/* Email Field */}
             <div>
