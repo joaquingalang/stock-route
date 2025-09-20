@@ -41,10 +41,18 @@ function OrderItemDetails({
         break;
       case "rejected":
         statusText = "Rejected";
+        statusBg = "bg-[#DC2626]";
+        break;
+      case "cancelled":
+        statusText = "Cancelled";
         statusBg = "bg-[#EA8D8D]";
         break;
+      case "shipped":
+        statusText = "Shipped";
+        statusBg = "bg-[#3C7B0C]";
+        break;
       default:
-        statusText = status;
+        statusText = cleaned;
         statusBg = "bg-gray-500";
     }
   }

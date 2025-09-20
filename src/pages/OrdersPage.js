@@ -56,23 +56,26 @@ function OrdersPage({ onNavigate }) {
     fetchOrders();
   }, []);
 
-  // Function to determine order status based on approved_by and billed_by
+  // Function to determine order status
   const getOrderStatus = (order) => {
     if (order.isRejected) {
       return "rejected"; // Rejected - red color
     }
-    if (!order.approved_by && !order.isRejected) {
-      return "progress"; // Waiting for approval - yellow color
-    } 
-    if (!order.billed_by && !order.isRejected) {
-      return "ready"; // Ready for shipping - green color
+    if (order.isCancelled) {
+      return "cancelled"; // Cancelled - light red color
     }
     if (order.isShipped) {
       return "shipped"; // Shipped - dark green color
     }
-    if (order.billed_by && !order.isRejected) {
+    if (order.billed_by && !order.isRejected && !order.isCancelled) {
       return "paid"; // Paid - blue color
-    } 
+    }
+    if (!order.billed_by && !order.isRejected && !order.isCancelled) {
+      return "ready"; // Ready for shipping - green color
+    }
+    if (!order.approved_by && !order.isRejected) {
+      return "progress"; // Waiting for approval - yellow color
+    }
   };
 
   // Function to get retailer name by ID
@@ -171,6 +174,14 @@ function OrdersPage({ onNavigate }) {
     {
       value: "rejected",
       label: "Rejected"
+    },
+    {
+      value: "cancelled",
+      label: "Cancelled"
+    },
+    {
+      value: "shipped",
+      label: "Shipped"
     },
   ];
 
