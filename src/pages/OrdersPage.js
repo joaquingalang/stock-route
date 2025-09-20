@@ -58,17 +58,20 @@ function OrdersPage({ onNavigate }) {
 
   // Function to determine order status based on approved_by and billed_by
   const getOrderStatus = (order) => {
+    if (order.isRejected) {
+      return "rejected"; // Rejected - red color
+    }
     if (!order.approved_by && !order.isRejected) {
       return "progress"; // Waiting for approval - yellow color
     } 
     if (!order.billed_by && !order.isRejected) {
       return "ready"; // Ready for shipping - green color
     }
-    if (order.isRejected) {
-      return "rejected"; // Rejected - red color
+    if (order.isShipped) {
+      return "shipped"; // Shipped - dark green color
     }
     if (order.billed_by && !order.isRejected) {
-      return "paid"; // Completed - blue color
+      return "paid"; // Paid - blue color
     } 
   };
 
