@@ -121,169 +121,175 @@ export const getStockData = async () => {
 
 // UPDATE INBOUND DATA - Update procurement order
 export const updateInboundData = async (poId, itemId, updateData) => {
-    try {
-      // Validate data before updating
-      if (updateData.received_qty > updateData.order_qty) {
-        throw new Error('Received quantity cannot exceed order quantity');
-      }
-  
-      if (updateData.damaged > updateData.received_qty) {
-        throw new Error('Damaged quantity cannot exceed received quantity');
-      }
-  
-      if (updateData.received_qty < 0 || updateData.damaged < 0 || updateData.order_qty < 0) {
-        throw new Error('Quantities cannot be negative');
-      }
-  
-      // First, get the current procurement order to compare values
-      const { data: currentOrder, error: fetchError } = await supabase
-        .from('procurement_orders')
-        .select('net_quantity')
-        .eq('po_id', poId)
-        .eq('item_id', itemId)
-        .single()
-  
-      if (fetchError) {
-        console.error('Error fetching current procurement order:', fetchError)
-        throw fetchError
-      }
-  
-      // Update the procurement order
-      const newNetQuantity = updateData.net_qty
-      const stockDifference = newNetQuantity - currentOrder.net_quantity
-  
-      const { data, error } = await supabase
-        .from('procurement_orders')
-        .update({
-          received_quantity: updateData.received_qty,
-          damaged_items: updateData.damaged,
-          missing_items: updateData.missing,
-          net_quantity: newNetQuantity
-        })
-        .eq('po_id', poId)
-        .eq('item_id', itemId)
-        .select()
-        .single()
-  
-      if (error) throw error
-  
-      // Update the stock quantity in the items table
-      if (stockDifference !== 0) {
-        const { data: currentItem, error: itemError } = await supabase
-          .from('items')
-          .select('stock_quantity')
-          .eq('item_id', itemId)
-          .single()
-  
-        if (itemError) {
-          console.error('Error fetching current item stock:', itemError)
-          // Still return success for procurement order update
-          return { data, error: null }
-        }
-  
-        // Calculate new stock quantity
-        const newStockQuantity = currentItem.stock_quantity + stockDifference
-  
-        // Update the items table with new stock quantity
-        const { error: updateError } = await supabase
-          .from('items')
-          .update({ stock_quantity: newStockQuantity })
-          .eq('item_id', itemId)
-  
-        if (updateError) {
-          console.error('Error updating item stock:', updateError)
-          // Still return success for procurement order update
-          return { data, error: null }
-        }
-  
-        console.log(`Updated stock for item ${itemId}: ${currentItem.stock_quantity} + ${stockDifference} = ${newStockQuantity}`)
-      }
-  
-      return { data, error: null }
-    } catch (error) {
-      console.error('Error updating inbound data:', error)
-      return { data: null, error }
+  try {
+    // Validate data before updating
+    if (updateData.received_qty > updateData.order_qty) {
+      throw new Error('Received quantity cannot exceed order quantity');
     }
-  }
 
-// CREATE NEW PROCUREMENT ORDER
-export const createProcurementOrder = async (procurementData) => {
-    try {
-      // Validate data before creating
-      if (procurementData.received_qty > procurementData.order_qty) {
-        throw new Error('Received quantity cannot exceed order quantity');
-      }
-  
-      if (procurementData.damaged > procurementData.received_qty) {
-        throw new Error('Damaged quantity cannot exceed received quantity');
-      }
-  
-      if (procurementData.received_qty < 0 || procurementData.damaged < 0 || procurementData.order_qty <= 0) {
-        throw new Error('Invalid quantity values');
-      }
-  
-      if (!procurementData.supplier_id) {
-        throw new Error('Supplier is required');
-      }
-  
-      if (!procurementData.product_id) {
-        throw new Error('Product is required');
-      }
-  
-      // First, create the procurement order
-      const { data, error } = await supabase
-        .from('procurement_orders')
-        .insert([{
-          item_id: procurementData.product_id,
-          supplier_id: procurementData.supplier_id,
-          ordered_quantity: procurementData.order_qty,
-          received_quantity: procurementData.received_qty,
-          damaged_items: procurementData.damaged,
-          missing_items: procurementData.missing,
-          net_quantity: procurementData.net_qty,
-          created_by: procurementData.created_by
-        }])
-        .select()
-        .single()
-  
-      if (error) throw error
-  
-      // Then, update the stock quantity in the items table
+    if (updateData.damaged > updateData.received_qty) {
+      throw new Error('Damaged quantity cannot exceed received quantity');
+    }
+
+    if (updateData.received_qty < 0 || updateData.damaged < 0 || updateData.order_qty < 0) {
+      throw new Error('Quantities cannot be negative');
+    }
+
+    // First, get the current procurement order to compare values
+    const { data: currentOrder, error: fetchError } = await supabase
+      .from('procurement_orders')
+      .select('net_quantity')
+      .eq('po_id', poId)
+      .eq('item_id', itemId)
+      .single()
+
+    if (fetchError) {
+      console.error('Error fetching current procurement order:', fetchError)
+      throw fetchError
+    }
+
+    // Update the procurement order
+    const newNetQuantity = updateData.net_qty
+    const stockDifference = newNetQuantity - currentOrder.net_quantity
+
+    const { data, error } = await supabase
+      .from('procurement_orders')
+      .update({
+        received_quantity: updateData.received_qty,
+        damaged_items: updateData.damaged,
+        missing_items: updateData.missing,
+        net_quantity: newNetQuantity
+      })
+      .eq('po_id', poId)
+      .eq('item_id', itemId)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    // Update the stock quantity in the items table
+    if (stockDifference !== 0) {
       const { data: currentItem, error: itemError } = await supabase
         .from('items')
         .select('stock_quantity')
-        .eq('item_id', procurementData.product_id)
+        .eq('item_id', itemId)
         .single()
-  
+
       if (itemError) {
         console.error('Error fetching current item stock:', itemError)
-        // Still return success for procurement order creation
+        // Still return success for procurement order update
         return { data, error: null }
       }
-  
+
       // Calculate new stock quantity
-      const newStockQuantity = currentItem.stock_quantity + procurementData.net_qty
-  
-      // Update the items table with new stock quantity
+      const newStockQuantity = currentItem.stock_quantity + stockDifference
+
+      // Update the items table with new stock quantity and updated_at
       const { error: updateError } = await supabase
         .from('items')
-        .update({ stock_quantity: newStockQuantity })
-        .eq('item_id', procurementData.product_id)
-  
+        .update({ 
+          stock_quantity: newStockQuantity,
+          updated_at: new Date().toISOString()
+        })
+        .eq('item_id', itemId)
+
       if (updateError) {
         console.error('Error updating item stock:', updateError)
-        // Still return success for procurement order creation
+        // Still return success for procurement order update
         return { data, error: null }
       }
-  
-      console.log(`Updated stock for item ${procurementData.product_id}: ${currentItem.stock_quantity} + ${procurementData.net_qty} = ${newStockQuantity}`)
-      
-      return { data, error: null }
-    } catch (error) {
-      console.error('Error creating procurement order:', error)
-      return { data: null, error }
+
+      console.log(`Updated stock for item ${itemId}: ${currentItem.stock_quantity} + ${stockDifference} = ${newStockQuantity}`)
     }
+
+    return { data, error: null }
+  } catch (error) {
+    console.error('Error updating inbound data:', error)
+    return { data: null, error }
   }
+}
+
+// CREATE NEW PROCUREMENT ORDER
+export const createProcurementOrder = async (procurementData) => {
+  try {
+    // Validate data before creating
+    if (procurementData.received_qty > procurementData.order_qty) {
+      throw new Error('Received quantity cannot exceed order quantity');
+    }
+
+    if (procurementData.damaged > procurementData.received_qty) {
+      throw new Error('Damaged quantity cannot exceed received quantity');
+    }
+
+    if (procurementData.received_qty < 0 || procurementData.damaged < 0 || procurementData.order_qty <= 0) {
+      throw new Error('Invalid quantity values');
+    }
+
+    if (!procurementData.supplier_id) {
+      throw new Error('Supplier is required');
+    }
+
+    if (!procurementData.product_id) {
+      throw new Error('Product is required');
+    }
+
+    // First, create the procurement order
+    const { data, error } = await supabase
+      .from('procurement_orders')
+      .insert([{
+        item_id: procurementData.product_id,
+        supplier_id: procurementData.supplier_id,
+        ordered_quantity: procurementData.order_qty,
+        received_quantity: procurementData.received_qty,
+        damaged_items: procurementData.damaged,
+        missing_items: procurementData.missing,
+        net_quantity: procurementData.net_qty,
+        created_by: procurementData.created_by
+      }])
+      .select()
+      .single()
+
+    if (error) throw error
+
+    // Then, update the stock quantity in the items table
+    const { data: currentItem, error: itemError } = await supabase
+      .from('items')
+      .select('stock_quantity')
+      .eq('item_id', procurementData.product_id)
+      .single()
+
+    if (itemError) {
+      console.error('Error fetching current item stock:', itemError)
+      // Still return success for procurement order creation
+      return { data, error: null }
+    }
+
+    // Calculate new stock quantity
+    const newStockQuantity = currentItem.stock_quantity + procurementData.net_qty
+
+    // Update the items table with new stock quantity and updated_at
+    const { error: updateError } = await supabase
+      .from('items')
+      .update({ 
+        stock_quantity: newStockQuantity,
+        updated_at: new Date().toISOString()
+      })
+      .eq('item_id', procurementData.product_id)
+
+    if (updateError) {
+      console.error('Error updating item stock:', updateError)
+      // Still return success for procurement order creation
+      return { data, error: null }
+    }
+
+    console.log(`Updated stock for item ${procurementData.product_id}: ${currentItem.stock_quantity} + ${procurementData.net_qty} = ${newStockQuantity}`)
+    
+    return { data, error: null }
+  } catch (error) {
+    console.error('Error creating procurement order:', error)
+    return { data: null, error }
+  }
+}
 
 // GET SUPPLIERS for dropdown
 export const getSuppliers = async () => {

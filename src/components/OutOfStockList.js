@@ -4,7 +4,7 @@ function OutOfStockList({outOfStockItems}) {
 
     const outOfStockList = outOfStockItems.map(items => (
         <div>
-            <OutOfStockTile name={items.name} timestamp={items.timestamp}></OutOfStockTile>
+            <OutOfStockTile name={items.name} timestamp={items.updated_at || items.created_at}></OutOfStockTile>
             <hr className="mx-6 m-2 bg-[#D9D9D9] h-px border-none"></hr>
         </div>
         )

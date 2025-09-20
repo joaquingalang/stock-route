@@ -28,7 +28,7 @@ function OrderItemDetails({
     let cleaned = status.toLowerCase();
     switch (cleaned) {
       case "ready":
-        statusText = "Ready";
+        statusText = "Approved";
         statusBg = "bg-[#60A32D]";
         break;
       case "progress":

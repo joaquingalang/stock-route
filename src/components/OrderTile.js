@@ -1,7 +1,3 @@
-import checkIcon from "../assets/check_icon.png";
-import clockIcon from "../assets/clock_icon.png";
-import completedIcon from "../assets/completed_icon.png";
-
 function OrderTile({ id, name, quantity, status }) {
   let idBackgroundColor = id % 2 === 0 ? "bg-[#293A7A]" : "bg-[#E36A61]";
 
@@ -10,31 +6,47 @@ function OrderTile({ id, name, quantity, status }) {
   let statusTextColor = "";
   let statusIcon = "";
 
-  switch (status.toLowerCase()) {
+  switch ((status || "").toLowerCase()) {
     case "ready":
-      statusText = "Ready";
+      statusText = "Approved";
       statusBackgroundColor = "bg-[#60A32D]";
-      statusTextColor = "text-[#3C7B0C]";
-      statusIcon = checkIcon;
+      statusTextColor = "text-white";
       break;
-    case "in progress": // <- matches your data better
     case "progress":
       statusText = "In Progress";
       statusBackgroundColor = "bg-[#CCD042]";
-      statusTextColor = "text-[#7B6A0C]";
-      statusIcon = clockIcon;
+      statusTextColor = "text-white";
       break;
-    case "completed":
-      statusText = "Completed";
+    case "paid":
+      statusText = "Paid";
       statusBackgroundColor = "bg-[#6C7EC2]";
-      statusTextColor = "text-[#293A7A]";
-      statusIcon = completedIcon;
+      statusTextColor = "text-white";
+      break;
+    case "pending":
+      statusText = "In Progress";
+      statusBackgroundColor = "bg-[#D7891D]";
+      statusTextColor = "text-white";
+      break;
+    case "cancelled":
+      statusText = "Cancelled";
+      statusBackgroundColor = "bg-[#EA8D8D]";
+      statusTextColor = "text-white";
+      statusIcon = "";
+      break;
+    case "rejected":
+      statusText = "Rejected";
+      statusBackgroundColor = "bg-[#DC2626]";
+      statusTextColor = "text-white"; 
+      break;
+    case "shipped":
+      statusText = "Shipped";
+      statusBackgroundColor = "bg-[#3C7B0C]";
+      statusTextColor = "text-white";
       break;
     default:
-      statusText = "Unknown";
-      statusBackgroundColor = "bg-gray-300";
-      statusTextColor = "text-gray-700";
-      statusIcon = "";
+      statusText = status || "Unknown";
+      statusBackgroundColor = "bg-gray-400";
+      statusTextColor = "text-white";
   }
 
   return (
@@ -43,7 +55,7 @@ function OrderTile({ id, name, quantity, status }) {
         <div
           className={`w-12 h-12 rounded-md flex justify-center items-center mr-5 ${idBackgroundColor}`}
         >
-          <h1 className="text-sm font-bold text-white">{`E${id}`}</h1>
+          <h1 className="text-sm font-bold text-white">{`${id}`}</h1>
         </div>
 
         <div className="flex flex-col justify-between">
@@ -54,7 +66,6 @@ function OrderTile({ id, name, quantity, status }) {
 
       <div className={`${statusBackgroundColor} rounded-md my-2 cursor-default`}>
         <div className="flex justify-center items-center h-[100%] mx-2">
-          {statusIcon && <img src={statusIcon} alt="" className="mr-1" />}
           <h1 className={`${statusTextColor} text-xs font-semibold`}>
             {statusText}
           </h1>
