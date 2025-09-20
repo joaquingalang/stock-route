@@ -5,14 +5,18 @@ import { useEffect, useState } from "react";
 import DetailedProductCard from "../components/DetailedProductCard";
 import { getAllItems } from "../services/ItemService.js";
 import { getAllCategories } from "../services/CategoryService.js";
+import NewProductModal from "../components/NewProductModal.js";
+import { useRole } from "../hooks/useRole";
 
 function ProductsPage() {
+    const { roleId } = useRole();
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [productList, setProductList] = useState([]);
     const [isProductSelected, setIsProductSelected] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState({});
     const [categoryList, setCategories] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
+    const [showModal, setShowModal] = useState(false);
 
     // fetch all categories
     useEffect(() => {
@@ -113,6 +117,20 @@ function ProductsPage() {
                     isSelected={selectedCategory === null}
                 ></CategoryButton>
                 {categories}
+                 {roleId === 6 && (
+                     <button
+                onClick={() => setShowModal(true)}
+                className="bg-[#D72A1D] rounded-md col-span-4 row-span-1 shadow-2xl cursor-pointer ml-auto"
+              >
+               
+                <div className="flex justify-center  items-center p-4">
+                  <h1 className="text-lg font-semibold text-white pr-5">+</h1>
+                  <h1 className="text-lg font-semibold text-white">
+                    Create New Product
+                  </h1>
+                </div>
+              </button>
+                )}
             </div>
 
             <div className="flex justify-between items-center mb-3">
@@ -147,6 +165,7 @@ function ProductsPage() {
             </div>
             <br/>
             <br/>
+             {showModal && <NewProductModal onClose={() => setShowModal(false)} />}
         </div>
     );
 }

@@ -86,17 +86,7 @@ function DashboardPage() {
 
             <div className="grid grid-cols-4 grid-rows-12 gap-6">
               {/* Create Product Button */}
-              <button
-                onClick={() => setShowModal(true)}
-                className="bg-[#D72A1D] rounded-md col-span-4 row-span-1 shadow-2xl cursor-pointer"
-              >
-                <div className="flex justify-center items-center p-4">
-                  <h1 className="text-lg font-semibold text-white pr-5">+</h1>
-                  <h1 className="text-lg font-semibold text-white">
-                    Create New Product
-                  </h1>
-                </div>
-              </button>
+              
 
               <PopularProductList popularProducts={popularProductList} />
 
