@@ -115,12 +115,6 @@ function OrdersPage({ onNavigate }) {
       year: '2-digit'
     });
 
-    // Debug logging
-    console.log('Original order:', originalOrder);
-    console.log('Order retailer data:', originalOrder.retailer);
-    console.log('Retailer ID:', originalOrder.retailer_id);
-    console.log('All retailers:', retailers);
-
     // Get retailer location - try multiple approaches
     let retailerLocation = "Location not available";
     

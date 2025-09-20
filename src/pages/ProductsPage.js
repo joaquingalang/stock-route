@@ -35,24 +35,46 @@ function ProductsPage() {
         fetchCategories();
       }, []);
 
-    // fetch all products
+    // Function to fetch all products
+    const fetchProducts = async () => {
+        try {
+            const { data, error } = await getAllItems();
+            if (error) {
+                console.error('Error fetching products:', error);
+            } else {
+                setProductList(data);
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
+    // fetch all categories
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchCategories = async () => {
             try {
-                const { data, error } = await getAllItems();
-                
+                const { data, error } = await getAllCategories();
                 if (error) {
-                  console.error('Error fetching products:', error);
+                    console.error('Error fetching categories:', error);
                 } else {
-                  setProductList(data);
-                  setFilteredProducts(data); 
+                    setCategories(data);
                 }
             } catch (error) {
-                console.error('Error fetching products:', error);
-            } 
-        }
+                console.error('Error fetching categories:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    // fetch all products on component mount
+    useEffect(() => {
         fetchProducts();
     }, []);
+
+    // Function to handle new product creation
+    const handleProductCreated = () => {
+        fetchProducts(); // Refresh the products list
+    };
 
     // Filter products when category changes
     useEffect(() => {
@@ -158,14 +180,20 @@ function ProductsPage() {
                     desc={selectedProduct.description}
                     quantity={selectedProduct.stock_quantity}
                     unitPrice={selectedProduct.unit_price}
-                    createdAt={selectedProduct.createdAt}
+                    category={selectedProduct.categories?.category_name}
+                    createdAt={selectedProduct.created_at}
                     />
                 </div>
                 )}
             </div>
             <br/>
             <br/>
-             {showModal && <NewProductModal onClose={() => setShowModal(false)} />}
+            {showModal && (
+                <NewProductModal 
+                    onClose={() => setShowModal(false)} 
+                    onProductCreated={handleProductCreated}
+                />
+            )}
         </div>
     );
 }
