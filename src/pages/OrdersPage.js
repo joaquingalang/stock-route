@@ -70,8 +70,8 @@ function OrdersPage({ onNavigate }) {
     if (order.billed_by && !order.isRejected && !order.isCancelled) {
       return "paid"; // Paid - blue color
     }
-    if (!order.billed_by && !order.isRejected && !order.isCancelled) {
-      return "ready"; // Ready for shipping - green color
+    if (order.approved_by && !order.isRejected && !order.isCancelled) {
+      return "ready"; //Approved - green color
     }
     if (!order.approved_by && !order.isRejected) {
       return "progress"; // Waiting for approval - yellow color
@@ -165,7 +165,7 @@ function OrdersPage({ onNavigate }) {
     },
     {
       value: "ready",
-      label: "Ready For Shipping"
+      label: "Approved"
     },
     {
       value: "paid",

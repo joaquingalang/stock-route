@@ -19,7 +19,7 @@ function MainPage() {
     function currentPage() {
         switch (selectedPage) {
             case "dashboard":
-                return <DashboardPage></DashboardPage>;
+                return <DashboardPage onNavigate={handleNavigation}></DashboardPage>;
             case "products":
                 return <ProductsPage></ProductsPage>;
             case "orders":

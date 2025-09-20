@@ -172,16 +172,17 @@ function ProductsPage() {
 
                 {isProductSelected && (
                 <div className="relative">
-                    <DetailedProductCard
-                    onClose={() => setIsProductSelected(false)}
-                    image={selectedProduct.image_url}
-                    name={selectedProduct.name}
-                    id={selectedProduct.item_id}
-                    desc={selectedProduct.description}
-                    quantity={selectedProduct.stock_quantity}
-                    unitPrice={selectedProduct.unit_price}
-                    category={selectedProduct.categories?.category_name}
-                    createdAt={selectedProduct.created_at}
+                    <DetailedProductCard 
+                        onClose={() => setSelectedProduct(null)}
+                        image={selectedProduct.image_url}
+                        name={selectedProduct.name}
+                        id={selectedProduct.item_id}
+                        desc={selectedProduct.description}
+                        quantity={selectedProduct.stock_quantity}
+                        unitPrice={selectedProduct.unit_price}
+                        category={selectedProduct.categories?.category_name}
+                        createdAt={selectedProduct.created_at}
+                        updatedAt={selectedProduct.updated_at}
                     />
                 </div>
                 )}

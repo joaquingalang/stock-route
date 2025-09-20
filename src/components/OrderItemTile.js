@@ -19,7 +19,11 @@ function OrderItemTile({ columns, order, onClick }) {
             let statusBg = "";
             switch ((order.status || "").toLowerCase()) {
               case "ready":
-                statusText = "Ready For Shipping";
+                statusText = "Approved";
+                statusBg = "bg-[#60A32D]";
+                break;
+              case "pending":
+                statusText = "Pending";
                 statusBg = "bg-[#60A32D]";
                 break;
               case "progress":
@@ -29,10 +33,6 @@ function OrderItemTile({ columns, order, onClick }) {
               case "paid":
                 statusText = "Paid";
                 statusBg = "bg-[#6C7EC2]";
-                break;
-              case "pending":
-                statusText = "In Progress";
-                statusBg = "bg-[#D7891D]";
                 break;
               case "cancelled":
                 statusText = "Cancelled";

@@ -1,6 +1,6 @@
 import CloseIcon from "../assets/close_icon.png";
 
-function DetailedProductCard({onClose, image, name, id, desc, quantity, unitPrice, category, createdAt}) {
+function DetailedProductCard({onClose, image, name, id, desc, quantity, unitPrice, category, createdAt, updatedAt}) {
 
     let quantityStatus = "";
     let backgroundColor = "";
@@ -33,6 +33,11 @@ function DetailedProductCard({onClose, image, name, id, desc, quantity, unitPric
             month: "long",
             day: "numeric",
         });
+    };
+
+    // Get the latest update date (updatedAt if available, otherwise createdAt)
+    const getLatestUpdateDate = () => {
+        return updatedAt || createdAt;
     };
 
     return (
@@ -74,6 +79,7 @@ function DetailedProductCard({onClose, image, name, id, desc, quantity, unitPric
 
                     <p className="text-xl font-semibold mb-2">History</p>
                     <p className="text-sm text-gray-500 font-regular">Date Added: <span className="font-semibold text-[#293A7A] ml-2">{formatDate(createdAt)}</span></p>
+                    <p className="text-sm text-gray-500 font-regular">Last Updated: <span className="font-semibold text-[#293A7A] ml-2">{formatDate(getLatestUpdateDate())}</span></p>
 
                 </div>
             </div>

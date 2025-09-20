@@ -1,9 +1,15 @@
 import PaymentTile from "./PaymentTile";
 
-function PaymentList({payments}) {
+function PaymentList({payments, onNavigate}) {
 
     const paymentList = payments.map(items => (
-        <PaymentTile id={items.id} name={items.name} orderId={items.orderId}></PaymentTile>
+        <PaymentTile 
+            key={items.id}
+            id={items.id} 
+            name={items.name} 
+            cost={items.cost}
+            onNavigate={onNavigate}
+        />
     ));
 
     return (
