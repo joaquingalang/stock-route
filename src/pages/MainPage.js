@@ -23,7 +23,7 @@ function MainPage() {
             case "products":
                 return <ProductsPage></ProductsPage>;
             case "orders":
-                return <BillingPage></BillingPage>;
+                return <WarehousePage></WarehousePage>;
         }
     }
 

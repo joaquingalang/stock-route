@@ -45,6 +45,18 @@ function OrderItemTile({ columns, order, onClick }) {
                 statusText = "Cancelled";
                 statusBg = "bg-[#EA8D8D]";
                 break;
+                 case "shipped":
+                statusText = "Shipped";
+                statusBg = "bg-[#3C7B0C]";
+                break;
+                 case "partial":
+                statusText = "Partial";
+                statusBg = "bg-[#D7891D]";
+                break;
+                 case "returned":
+                statusText = "Returned";
+                statusBg = "bg-[#6C7EC2]";
+                break;
               default:
                 statusText = order.status;
                 statusBg = "bg-gray-400";
