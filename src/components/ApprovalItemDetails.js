@@ -2,20 +2,34 @@ import OrderItemRow from "./OrderItemRow";
 
 function ApprovalItemDetails({
   show,
+  action,
   onClick,
+  onApprove,
+  onReject,
+  onCancel,
+  onClose,
   cust_id,
   order_id,
   amount,
   date,
+  orderItems = [],
+  retailerLocation = "Location not available"
 }) {
   if (!show) return null;
+
+  // Use the orderItems prop instead of hardcoded data
+  const orders = orderItems.map(item => ({
+    itemName: item.items?.name || "Unknown Item",
+    quantity: item.quantity.toString(),
+    amount: item.total_price?.toFixed(2) || "0.00",
+  }));
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-center backdrop-blur">
       <div className="bg-white p-8 rounded-lg shadow-lg">
         <div className="grid grid-cols-3 gap-8">
           <div>
-            <h1 className="font-bold">Approval Request</h1>
+            <h1 className="font-bold"> {action} Approval Request</h1>
             <h1 className="font-bold">Order ID: {order_id}</h1>
           </div>
           <div className="col-span-3 bg-[#eff6ff] border-1 border-[#d1e5ff] rounded-md p-3">
@@ -29,8 +43,7 @@ function ApprovalItemDetails({
               <h1>{cust_id}</h1>
               <h1 className="font-semibold pt-3">Location</h1>
               <h1 className="max-w-xs break-words">
-                Blk 12 Lot 8, Mabini Street, Brgy. San Isidro Quezon City, Metro
-                Manila, 1105 Philippines
+                {retailerLocation}
               </h1>
             </div>
             <div>
@@ -47,11 +60,22 @@ function ApprovalItemDetails({
             <h1>Amount</h1>
           </div>
 
-          {/* The more orders, the more rows here. */}
+          {/* Display actual order items */}
           <div className="rounded-b-md overflow-y-auto max-h-50">
-            <OrderItemRow itemName="Joaquin" quantity="1" amount="5" />
-            <OrderItemRow itemName="Aaron" quantity="5" amount="254.29" />
-            <OrderItemRow itemName="Kyle" quantity="10" amount="-2" />
+            {orders.length > 0 ? (
+              orders.map((order, index) => (
+                <OrderItemRow
+                  key={`${order_id}-item-${index}`}
+                  itemName={order.itemName}
+                  quantity={order.quantity}
+                  amount={order.amount}
+                />
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                No items found
+              </div>
+            )}
           </div>
         </div>
 
@@ -63,14 +87,20 @@ function ApprovalItemDetails({
         <div></div>
         <div className="col-span-2 flex justify-end gap-3">
           <button
-            className="mt-4 px-4 py-2 bg-red-500 text-red-400 rounded bg-white border-1 border-red- hover:bg-red-200 hover:text-black text-red-400"
-            onClick={onClick}
+            className="mt-4 px-4 py-2 bg-red-500 text-white rounded border-1 hover:bg-red-600"
+            onClick={action === "Assignment" ? onReject : onCancel}
           >
-            Decline
+            {action === "Assignment" ? "Decline" : "Cancel"}
+          </button>
+          <button
+            className="mt-4 px-4 py-2 bg-gray-500 text-white rounded border-1 hover:bg-gray-600"
+            onClick={onClose}
+          >
+            Close
           </button>
           <button
             className="mt-4 px-4 py-2 text-white bg-[#293A7A] rounded border-1 hover:bg-blue-500"
-            onClick={onClick}
+            onClick={onApprove}
           >
             Accept
           </button>

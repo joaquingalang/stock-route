@@ -29,13 +29,9 @@ function OrderItemTile({ columns, order, onClick }) {
                 statusText = "In Progress";
                 statusBg = "bg-[#CCD042]";
                 break;
-              case "completed":
-                statusText = "Completed";
-                statusBg = "bg-[#6C7EC2]";
-                break;
               case "paid":
                 statusText = "Paid";
-                statusBg = "bg-[#74D71D]";
+                statusBg = "bg-[#6C7EC2]";
                 break;
               case "pending":
                 statusText = "In Progress";
@@ -45,15 +41,19 @@ function OrderItemTile({ columns, order, onClick }) {
                 statusText = "Cancelled";
                 statusBg = "bg-[#EA8D8D]";
                 break;
-                 case "shipped":
+              case "rejected":
+                statusText = "Rejected";
+                statusBg = "bg-[#EA8D8D]";
+                break;
+              case "shipped":
                 statusText = "Shipped";
                 statusBg = "bg-[#3C7B0C]";
                 break;
-                 case "partial":
+              case "partial":
                 statusText = "Partial";
                 statusBg = "bg-[#D7891D]";
                 break;
-                 case "returned":
+              case "returned":
                 statusText = "Returned";
                 statusBg = "bg-[#6C7EC2]";
                 break;

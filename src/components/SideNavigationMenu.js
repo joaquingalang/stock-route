@@ -5,9 +5,11 @@ import gridIcon from "../assets/grid_icon.png";
 import serverIcon from "../assets/server_icon.png";
 import clipboardIcon from "../assets/clipboard_icon.png";
 import logoutIcon from "../assets/logout_icon.png";
+import { useRole } from "../hooks/useRole";
 
 function SideNavigationMenu({onClick, currentPage}) {
     const { signOut } = useAuth();
+    const { roleId } = useRole();
 
     const handleLogout = async () => {
         try {
@@ -31,7 +33,18 @@ function SideNavigationMenu({onClick, currentPage}) {
                 <div className="mx-10">
                     <MenuButton onClick={() => onClick("dashboard")} icon={gridIcon} selected={currentPage === "dashboard"}>Dashboard</MenuButton>
                     <MenuButton onClick={() => onClick("products")} icon={serverIcon} selected={currentPage === "products"}>Products</MenuButton>
-                    <MenuButton onClick={() => onClick("orders")} icon={clipboardIcon} selected={currentPage === "orders"}>Orders</MenuButton>
+                    <MenuButton onClick={() => onClick("orders")} icon={clipboardIcon} selected={currentPage === "orders" || currentPage === "createOrder"}>Orders</MenuButton>
+
+                    {/* Role-specific button */}
+                    {roleId === 3 && (
+                        <MenuButton onClick={() => onClick("approvals")} icon={clipboardIcon} selected={currentPage === "approvals"}>Approvals</MenuButton>
+                    )}
+                    {roleId === 4 && (
+                        <MenuButton onClick={() => onClick("billings")} icon={clipboardIcon} selected={currentPage === "billings"}>Billing</MenuButton>
+                    )}
+                    {roleId === 6 && (
+                        <MenuButton onClick={() => onClick("warehouse")} icon={clipboardIcon} selected={currentPage === "warehouse"}>Warehouse</MenuButton>
+                    )}
                 </div>
             </div>
 
