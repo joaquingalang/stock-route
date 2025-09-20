@@ -204,7 +204,7 @@ function OrdersPage({ onNavigate }) {
                     onFilterChange={setFilter}
                     filters={filters}
                   />
-                  {roleId === 1 && (
+                  {roleId === 2 && (
                     <button 
                     onClick={() => onNavigate("createOrder")}
                     className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-semibold"
