@@ -11,7 +11,7 @@ function getFilterButtonStyle(filter, buttonFilter) {
 function OrderFilterButtons({ currentFilter, onFilterChange, filters}) {
 
   return (
-    <div className="grid grid-cols-4 gap-4 p-4 mb-3 items-center">
+    <div className={`grid grid-cols-${filters.length} gap-4 p-4 mb-3 items-center`}>
       {filters.map((filterItem) => {
         return (
           <button
