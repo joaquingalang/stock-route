@@ -1,75 +1,109 @@
 import OrderItemTile from "../components/OrderItemTile";
-import { useState } from "react";
-import ApprovalItemDetails from "../components/ApprovalItemDetails";
+import { useState, useEffect } from "react";
 import OrderTableHeader from "../components/OrderTableHeader";
-import OrderFilterButtons from "../components/OrderFilterButtons";
 import WarehouseTabs from "../components/WarehouseTabs";
 import EditInboundPopup from "../components/EditInboundPopup";
 import ProcurementPopup from "../components/ProcurementPopup";
+import OutboundActionPopup from "../components/OutboundActionPopup";
+import { 
+  getInboundData, 
+  getOutboundData, 
+  getStockData, 
+  updateInboundData,
+  createProcurementOrder,
+  updateOrderShippingStatus,
+  getSuppliers,
+  getItems
+} from "../services/WarehouseService";
+import { useAuth } from "../contexts/AuthContext";
 
 function WarehousePage() {
   const [showModal, setShowModal] = useState(false);
   const [showProcurementModal, setShowProcurementModal] = useState(false);
+  const [showOutboundModal, setShowOutboundModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOutboundOrder, setSelectedOutboundOrder] = useState(null);
+  const [selectedOutboundItems, setSelectedOutboundItems] = useState([]);
   const [activeTab, setActiveTab] = useState("inbound");
+  const [loading, setLoading] = useState(true);
+  
+  // Data states
+  const [inboundData, setInboundData] = useState([]);
+  const [outboundData, setOutboundData] = useState([]);
+  const [stockData, setStockData] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [products, setProducts] = useState([]);
+  
+  const { user } = useAuth();
 
-  const suppliers = [
-    { supplier_id: "HAUL-SUP-123", supplier_name: "Supplier Name 1" },
-    { supplier_id: "HAUL-SUP-124", supplier_name: "Supplier Name 2" },
-    { supplier_id: "HAUL-SUP-125", supplier_name: "Supplier Name 3" },
-  ];
+  // Function to fetch all data
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch all data in parallel
+      const [inboundResult, outboundResult, stockResult, suppliersResult, itemsResult] = await Promise.all([
+        getInboundData(),
+        getOutboundData(),
+        getStockData(),
+        getSuppliers(),
+        getItems()
+      ]);
 
-  const products = [
-    { product_id: "PROD-1001", product_name: "Leather Belt" },
-    { product_id: "PROD-1002", product_name: "Cotton Shirt" },
-    { product_id: "PROD-1003", product_name: "Denim Jeans" },
-  ];
+      if (inboundResult.error) {
+        console.error('Error fetching inbound data:', inboundResult.error);
+      } else {
+        setInboundData(inboundResult.data || []);
+      }
 
-  // Inbound Data - Items coming into warehouse
-  const [inboundData, setInboundData] = useState([
-    {
-      po_id: "PO-2025-001",
-      supplier_id: "HAUL-SUP-123",
-      product_id: "PROD-1001",
-      order_qty: 3,
-      received_qty: 3,
-      damaged: 0,
-      missing: 0,
-      rejected: 0,
-    },
-  ]);
+      if (outboundResult.error) {
+        console.error('Error fetching outbound data:', outboundResult.error);
+      } else {
+        setOutboundData(outboundResult.data || []);
+      }
 
-  // Outbound Data - Items going out of warehouse
-  const outboundData = [
-    {
-      so_id: "SO-2025-045",
-      cust_id: "CUST-0098",
-      product_id: "PROD-1001",
-      order_qty: 3,
-      shipped_qty: 3,
-      pending: 0,
-      returned: 0,
-      status: "shipped",
-    },
-  ];
+      if (stockResult.error) {
+        console.error('Error fetching stock data:', stockResult.error);
+      } else {
+        setStockData(stockResult.data || []);
+      }
 
-  // Stock Data - Current inventory
-  const stockData = [
-    {
-      product_id: "PROD-1001",
-      product_name: "Leather Belt",
-      total_inbound_qty: 120,
-      total_outbound_qty: 90,
-      available_stock: 30,
-      damaged: 2,
-      last_updated: "2025-09-18",
-    },
-  ];
+      if (suppliersResult.error) {
+        console.error('Error fetching suppliers:', suppliersResult.error);
+      } else {
+        setSuppliers(suppliersResult.data || []);
+      }
 
+      if (itemsResult.error) {
+        console.error('Error fetching items:', itemsResult.error);
+      } else {
+        setProducts(itemsResult.data || []);
+      }
+
+    } catch (error) {
+      console.error('Error fetching warehouse data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data when component mounts
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  // Fetch data when tab changes
+  useEffect(() => {
+    if (!loading) { // Only refresh if not initial load
+      fetchAllData();
+    }
+  }, [activeTab]);
+
+  // Column definitions
   const inboundColumns = [
     { field: "po_id", label: "Product Order ID" },
-    { field: "supplier_id", label: "Supplier ID" },
-    { field: "product_id", label: "Product ID" },
+    { field: "supplier_name", label: "Supplier Name" },
+    { field: "product_name", label: "Product Name" },
     { field: "order_qty", label: "Ordered Qty" },
     { field: "received_qty", label: "Received Qty" },
     { field: "damaged", label: "Damaged" },
@@ -78,42 +112,49 @@ function WarehousePage() {
   ];
 
   const outboundColumns = [
-    { field: "so_id", label: "SO Number" },
-    { field: "cust_id", label: "Customer ID" },
-    { field: "product_id", label: "Product ID" },
+    { field: "order_item_id", label: "Order Item ID" },
+    { field: "order_id", label: "Order ID" },
+    { field: "retailer_name", label: "Retailer Name" },
+    { field: "product_name", label: "Product Name" },
     { field: "order_qty", label: "Ordered Qty" },
-    { field: "shipped_qty", label: "Shipped Qty" },
     { field: "status", label: "Status" },
   ];
 
   const stockColumns = [
     { field: "product_name", label: "Product Name" },
     { field: "product_id", label: "Product ID" },
-    { field: "total_inbound_qty", label: "Total Inbound Qty" },
-    { field: "total_outbound_qty", label: "Total Outbound Qty" },
     { field: "available_stock", label: "Available Stock" },
-    { field: "damaged", label: "Damaged" },
     { field: "last_updated", label: "Last Updated" },
   ];
 
-  // ...existing code...
-const handleOrderClick = (order) => {
-  if (activeTab === "inbound") {
-    setSelectedOrder({
-      po_id: order.po_id,
-      supplier_id: order.supplier_id,
-      product_id: order.product_id,
-      order_qty: order.order_qty,
-      received_qty: order.received_qty,
-      damaged: order.damaged || 0,
-      missing: order.missing || 0,
-      rejected: order.rejected || 0,
-    });
-    setShowModal(true);
-  }
-  // Add handling for other tabs if needed
-};
-// ...existing code...
+  const handleOrderClick = (order) => {
+    if (activeTab === "inbound") {
+      setSelectedOrder({
+        po_id: order.po_id,
+        supplier_id: order.supplier_id,
+        supplier_name: order.supplier_name,
+        product_id: order.product_id,
+        product_name: order.product_name,
+        order_qty: order.order_qty,
+        received_qty: order.received_qty,
+        damaged: order.damaged || 0,
+        missing: order.missing || 0,
+        rejected: order.rejected || 0,
+      });
+      setShowModal(true);
+    } else if (activeTab === "outbound") {
+      // Find all order items with the same order_id
+      const allItemsForOrder = outboundData.filter(item => item.order_id === order.order_id);
+      
+      setSelectedOutboundOrder({
+        order_id: order.order_id,
+        retailer_name: order.retailer_name,
+      });
+      setSelectedOutboundItems(allItemsForOrder);
+      setShowOutboundModal(true);
+    }
+    // Add handling for stock tab if needed
+  };
 
   const getCurrentData = () => {
     switch (activeTab) {
@@ -129,6 +170,84 @@ const handleOrderClick = (order) => {
   };
 
   const { data, columns } = getCurrentData();
+
+  // Handle inbound data update
+  const handleInboundUpdate = async (updatedData) => {
+    try {
+      const result = await updateInboundData(selectedOrder.po_id, selectedOrder.product_id, updatedData);
+      if (result.error) {
+        console.error('Error updating inbound data:', result.error);
+        alert(`Error: ${result.error.message || result.error}`);
+        return;
+      }
+
+      // Update local state
+      setInboundData((prev) =>
+        prev.map((item) =>
+          item.po_id === selectedOrder.po_id && item.product_id === selectedOrder.product_id
+            ? { ...item, ...updatedData }
+            : item
+        )
+      );
+      setShowModal(false);
+    } catch (error) {
+      console.error('Error updating inbound data:', error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  // Handle new procurement order creation
+  const handleNewProcurement = async (newProcurementData) => {
+    try {
+      const procurementData = {
+        ...newProcurementData,
+        created_by: user?.id
+      };
+
+      const result = await createProcurementOrder(procurementData);
+      if (result.error) {
+        console.error('Error creating procurement order:', result.error);
+        alert(`Error: ${result.error.message || result.error}`);
+        return;
+      }
+
+      // Refresh all data to get updated stock quantities
+      await fetchAllData();
+      
+      setShowProcurementModal(false);
+    } catch (error) {
+      console.error('Error creating procurement order:', error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  // Handle outbound shipping
+  const handleShipOrder = async () => {
+    try {
+      const result = await updateOrderShippingStatus(selectedOutboundOrder.order_id);
+      if (result.error) {
+        console.error('Error updating shipping status:', result.error);
+        alert(`Error: ${result.error.message || result.error}`);
+        return;
+      }
+
+      // Refresh outbound data to show updated status
+      await fetchAllData();
+      
+      console.log(`Order ${selectedOutboundOrder.order_id} marked as shipped`);
+    } catch (error) {
+      console.error('Error shipping order:', error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="col-span-16 h-screen flex items-center justify-center">
+        <div className="text-xl">Loading warehouse data...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="col-span-16 h-screen">
@@ -166,33 +285,27 @@ const handleOrderClick = (order) => {
                 <div className="overflow-y-auto max-h-150">
                   {data.map((value) => (
                     <OrderItemTile
-                      key={value.po_id}
+                      key={value.po_id || value.order_item_id || value.product_id}
                       columns={columns}
                       order={value}
                       onClick={handleOrderClick}
                     />
                   ))}
                 </div>
+
+                {/* Inbound Edit Modal */}
                 {showModal && selectedOrder && activeTab === "inbound" && (
                   <EditInboundPopup
                     show={showModal}
                     suppliers={suppliers}
                     products={products}
                     onClick={() => setShowModal(false)}
-                    onSave={(updatedData) => {
-                      console.log("Updated inbound data:", updatedData);
-                      setInboundData((prev) =>
-                        prev.map((item) =>
-                          item.po_id === selectedOrder.po_id
-                            ? { ...item, ...updatedData }
-                            : item
-                        )
-                      );
-                      setShowModal(false); // Add this line to close modal after save
-                    }}
+                    onSave={handleInboundUpdate}
                     {...selectedOrder}
                   />
                 )}
+
+                {/* Procurement Modal */}
                 {showProcurementModal && (
                   <ProcurementPopup
                     show={showProcurementModal}
@@ -200,12 +313,18 @@ const handleOrderClick = (order) => {
                     products={products}
                     inboundDataLength={inboundData.length}
                     onClose={() => setShowProcurementModal(false)}
-                    onClick={(newProcurementData) => {
-                      console.log("New procurement:", newProcurementData);
-                      // Add the new procurement data to inboundData array
-                      setInboundData((prev) => [...prev, newProcurementData]);
-                      setShowProcurementModal(false);
-                    }}
+                    onClick={handleNewProcurement}
+                  />
+                )}
+
+                {/* Outbound Action Modal */}
+                {showOutboundModal && selectedOutboundOrder && selectedOutboundItems.length > 0 && activeTab === "outbound" && (
+                  <OutboundActionPopup
+                    show={showOutboundModal}
+                    orderData={selectedOutboundOrder}
+                    allOrderItems={selectedOutboundItems}
+                    onClose={() => setShowOutboundModal(false)}
+                    onShip={handleShipOrder}
                   />
                 )}
               </div>
