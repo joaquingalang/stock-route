@@ -1,15 +1,12 @@
 function OrderItemTile({ columns, order, onClick }) {
+  const handleClick = () => {
+    // Pass the entire order object instead of specific fields
+    onClick(order);
+  };
+
   return (
     <button
-      onClick={() =>
-        onClick(
-          order.cust_id,
-          order.order_id,
-          order.amount,
-          order.status,
-          order.date
-        )
-      }
+      onClick={handleClick}
       type="button"
       className="w-full"
     >

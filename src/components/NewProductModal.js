@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import CloseIcon from "../assets/close_icon.png";
 import NewSupplyDropdown from "./NewSupplyDropdown";
-import { getAllSuppliers } from '../services/SupplierService.js'
-import { getAllCategories } from '../services/CategoryService.js'
-import { createItem } from '../services/ItemService.js'
-import { uploadImage } from '../services/ImageService.js'
+import { getAllSuppliers } from "../services/SupplierService.js";
+import { getAllCategories } from "../services/CategoryService.js";
+import { createItem } from "../services/ItemService.js";
+import { uploadImage } from "../services/ImageService.js";
 
 function NewProductModal({ onClose }) {
   const [image, setImage] = useState(null);
@@ -12,7 +12,7 @@ function NewProductModal({ onClose }) {
   const [desc, setDesc] = useState("");
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] = useState(null);
-  const [price, setPrice] = useState(0.00);
+  const [price, setPrice] = useState(0.0);
   const [supplier, setSupplier] = useState("");
   const [suppliers, setSuppliers] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -28,19 +28,19 @@ function NewProductModal({ onClose }) {
     const file = e.target.files[0];
     if (file) {
       // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
+      if (!file.type.startsWith("image/")) {
+        alert("Please select an image file");
         return;
       }
-      
+
       // Validate file size (e.g., max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('Image size should be less than 5MB');
+        alert("Image size should be less than 5MB");
         return;
       }
 
       setImageFile(file); // Store the file for upload
-      
+
       const reader = new FileReader();
       reader.onloadend = () => setImage(reader.result);
       reader.readAsDataURL(file);
@@ -52,37 +52,41 @@ function NewProductModal({ onClose }) {
     setImageFile(null);
   };
 
-  {/* Fetch Suppliers */}
+  {
+    /* Fetch Suppliers */
+  }
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
         const { data, error } = await getAllSuppliers();
-        
+
         if (error) {
-          console.error('Error fetching suppliers:', error);
+          console.error("Error fetching suppliers:", error);
         } else {
           setSuppliers(data);
         }
       } catch (error) {
-        console.error('Error fetching suppliers:', error);
-      } 
+        console.error("Error fetching suppliers:", error);
+      }
     };
     fetchSuppliers();
   }, []);
 
-  {/* Fetch Categories */}
+  {
+    /* Fetch Categories */
+  }
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const { data, error } = await getAllCategories();
-        
+
         if (error) {
-          console.error('Error fetching categories:', error);
+          console.error("Error fetching categories:", error);
         } else {
           setCategories(data);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error("Error fetching categories:", error);
       } finally {
       }
     };
@@ -93,27 +97,27 @@ function NewProductModal({ onClose }) {
   const handleSave = async () => {
     // Validation
     if (!name.trim()) {
-      alert('Please enter a product name');
+      alert("Please enter a product name");
       return;
     }
     if (!desc.trim()) {
-      alert('Please enter a product description');
+      alert("Please enter a product description");
       return;
     }
     if (!quantity || quantity <= 0) {
-      alert('Please enter a valid quantity');
+      alert("Please enter a valid quantity");
       return;
     }
     if (!price || price <= 0) {
-      alert('Please enter a valid price');
+      alert("Please enter a valid price");
       return;
     }
     if (!category) {
-      alert('Please select a category');
+      alert("Please select a category");
       return;
     }
     if (!supplier) {
-      alert('Please select a supplier');
+      alert("Please select a supplier");
       return;
     }
 
@@ -123,14 +127,16 @@ function NewProductModal({ onClose }) {
       // Upload image if one is selected
       if (imageFile) {
         console.log("Uploading image...");
-        const { data: uploadData, error: uploadError } = await uploadImage(imageFile);
-        
+        const { data: uploadData, error: uploadError } = await uploadImage(
+          imageFile
+        );
+
         if (uploadError) {
-          console.error('Error uploading image:', uploadError);
-          alert('Failed to upload image. Please try again.');
+          console.error("Error uploading image:", uploadError);
+          alert("Failed to upload image. Please try again.");
           return;
         }
-        
+
         imageUrl = uploadData.publicUrl;
         console.log("Image uploaded successfully:", imageUrl);
       }
@@ -143,36 +149,35 @@ function NewProductModal({ onClose }) {
         stock_quantity: parseInt(quantity),
         category_id: category.category_id,
         supplier_id: supplier.supplier_id,
-        image_url: imageUrl
+        image_url: imageUrl,
       };
 
       console.log("Creating item with data:", itemData);
 
       if (!itemData.category_id) {
-        alert('Category ID is missing. Please select a category again.');
+        alert("Category ID is missing. Please select a category again.");
         return;
       }
       if (!itemData.supplier_id) {
-        alert('Supplier ID is missing. Please select a supplier again.');
+        alert("Supplier ID is missing. Please select a supplier again.");
         return;
       }
-      
+
       const { data, error } = await createItem(itemData);
-      
+
       if (error) {
-        console.error('Error creating item:', error);
-        alert('Failed to create product. Please try again.');
+        console.error("Error creating item:", error);
+        alert("Failed to create product. Please try again.");
         return;
       }
 
       console.log("Product created successfully:", data);
-      alert('Product created successfully!');
+      alert("Product created successfully!");
       onClose(); // Close modal after successful creation
-      
     } catch (error) {
-      console.error('Error creating item:', error);
-      alert('Failed to create product. Please try again.');
-    } 
+      console.error("Error creating item:", error);
+      alert("Failed to create product. Please try again.");
+    }
   };
 
   return (
@@ -277,7 +282,10 @@ function NewProductModal({ onClose }) {
             <label className="block text-lg font-semibold text-gray-600 mb-1">
               Supplier
             </label>
-            <NewSupplyDropdown onSelect={(selectedSupplier) => setSupplier(selectedSupplier)} suppliers={suppliers}></NewSupplyDropdown>
+            <NewSupplyDropdown
+              onSelect={(selectedSupplier) => setSupplier(selectedSupplier)}
+              suppliers={suppliers}
+            ></NewSupplyDropdown>
           </div>
         </div>
 
