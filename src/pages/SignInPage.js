@@ -11,7 +11,7 @@ function SignInPage() {
   useEffect(() => {
     if (user && !loading) {
       // Redirect to dashboard or main app
-      navigate('/dashboard');
+      navigate('/main');
     }
   }, [user, loading, navigate]);
 

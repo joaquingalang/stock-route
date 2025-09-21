@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuth, AuthProvider } from './contexts/AuthContext';
 import SignInPage from './pages/SignInPage';
 import MainPage from './pages/MainPage';
+import SplashScreenPage from './pages/SplashScreenPage';
 
 function App() {
   const { user, loading } = useAuth();
@@ -15,7 +16,11 @@ function App() {
       <Routes>
         <Route 
           path="/" 
-          element={user ? <Navigate to="/main" replace /> : <SignInPage />} 
+          element={user ? <Navigate to="/main" replace /> : <SplashScreenPage />} 
+        />
+        <Route 
+          path="/signIn" 
+          element={<SignInPage/>} 
         />
         <Route 
           path="/main" 
